@@ -3,6 +3,10 @@ import os
 import xml_to_excel
 from PyQt5.QtWidgets import (QWidget, QLCDNumber, QSlider,
     QVBoxLayout, QApplication, QPushButton, QFileDialog, QAction)
+from PyQt5.QtCore import QUrl
+from PyQt5 import QtWidgets
+from PyQt5 import QtCore
+
 
 
 from PyQt5.QtGui import QIcon
@@ -15,19 +19,25 @@ class UI(QWidget):
         self.initUI()
 
     def initUI(self):
-        chooseb = QPushButton("выбрать csv")
-        runb = QPushButton("добавить надпись")
+        chooseb = QPushButton("выбрать xml файл")
+        runb = QPushButton("трансформировать")  # TODO сохранить и трасформировать в одну кнопку
+        savef = QPushButton("выбрать папку сохранения")
 
         chooseb.addAction(QAction(QIcon('open.png'), 'Open', self))
         chooseb.setStatusTip('Выбрать csv файл со списком скриншотов')
-        chooseb.clicked.connect(self.showDialog)
+        chooseb.clicked.connect(self.chooseXMLFileDialog)
 
         runb.addAction(QAction(QIcon('run.png'), 'Run', self))
         runb.setStatusTip('Запустить программу')
         runb.clicked.connect(self.runProgram)
 
+        savef.addAction(QAction(QIcon('save_folder.png'), 'save_folder', self))
+        savef.setStatusTip('Выберите папку для сохранения')
+        savef.clicked.connect(self.saveFolderDialog)
+
         vbox = QVBoxLayout()
         vbox.addWidget(chooseb)
+        vbox.addWidget(savef)
         vbox.addWidget(runb)
 
 
@@ -37,14 +47,19 @@ class UI(QWidget):
         self.setWindowTitle('Добавить надпись')
         self.show()
 
-    def showDialog(self):
-        fname = QFileDialog.getOpenFileName(self, 'Open file', '/home')[0]
-        print("Выбрано")
-        self.fname = fname
+    def chooseXMLFileDialog(self):
+        file_name = QFileDialog.getOpenFileName(self, 'Open file', '/home')[0]
+        print(f"Выбран файл {file_name}")
+        self.file_name = file_name
 
+    def saveFolderDialog(self):
+        folder_name = QtWidgets.QFileDialog.getExistingDirectory(self, 'Сохранить в папку', '/home')
+        print(f"Выбрана директория {folder_name}")
+        self.folder_name = folder_name
 
     def runProgram(self):
-        xml_to_excel.main(file=self.fname)
+        pass
+        # xml_to_excel.main(file=self.fname)
 
     def setUp(self):
         self.no_exceptions = True
