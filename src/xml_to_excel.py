@@ -77,21 +77,25 @@ def main(*args, **kwargs):
     xml_rudoc[8] = xml_dict['old_number'] # Ранее присвоенный государственный учетный номер
     xml_rudoc[9] = xml_dict['readable_address'] # Адрес
     # base_parameter много значений, пример area-70-кв. метры
-    xml_rudoc[10] = ''#xml_dict[''] # Основная характеристика сооружения # Тип
-    xml_rudoc[11] = ''#xml_dict[''] # Основная характеристика сооружения # Значение
-    xml_rudoc[12] = ''#xml_dict[''] # Основная характеристика сооружения # Единица измерения
-    # xml_rudoc[13] = xml_dict['name'] # Наименование (сооружения?) ### TODO get parent
-    xml_rudoc[14] = xml_dict['purpose'] # назначение сооружения?
-    xml_rudoc[15] = xml_dict['floors']  # Количество этажей, в том числе подземных этажей
-    xml_rudoc[16] = xml_dict['year_commisioning'] # Год ввода в эксплуатацию по завершении строительства
-    xml_rudoc[17] = xml_dict['year_built'] # Год завершения строительства
-    # xml_rudoc[18] = xml_dict['value'] # Кадастровая стоимость ### TODO get parent
-    xml_rudoc[19] = xml_dict['land_cad_numbers'] # Кадастровые номера иных объектов недвижимости, в пределах которых расположен объект недвижимости
-    xml_rudoc[20] = str(xml_dict['room_cad_numbers']) # Кадастровые номера машино-мест расположенных в здании или сооружении
-    xml_rudoc[20] += " " + str(xml_dict['car_parking_space_cad_numbers']) # Кадастровые номера помещений расположенных в здании или сооружении
-    xml_rudoc[21] = xml_dict['permitted_use'] # Вид разрешённого использования
-    xml_rudoc[22] = xml_dict['status'] # Статус записи об объекте недвижимости
-    xml_rudoc[23] = xml_dict['special_notes'] # "особые отметки" - особые отметки
+    xml_rudoc[10] = xml_dict['area'] # Основная характеристика сооружения # Площадь в кв. метрах
+    xml_rudoc[11] = xml_dict['built_up_area'] # Основная характеристика сооружения # Площадь застройки в квадратных метрах с округлением до 0,1 квадратного метра
+    xml_rudoc[12] = xml_dict['extension'] # Основная характеристика сооружения # Протяженность в метрах с округлением до 1 метра
+    xml_rudoc[13] = xml_dict['depth'] # Основная характеристика сооружения # Глубина в метрах с округлением до 0,1 метра
+    xml_rudoc[14] = xml_dict['occurence_depth'] # Основная характеристика сооружения # Глубина залегания в метрах с округлением до 0,1 метра
+    xml_rudoc[15] = xml_dict['volume'] # Основная характеристика сооружения # Объем в кубических метрах с округлением до 1 кубического метра
+    xml_rudoc[16] = xml_dict['height'] # Основная характеристика сооружения # Высота в метрах с округлением до 0,1 метра
+    # xml_rudoc[17] = xml_dict['name'] # Наименование (сооружения?) ### TODO get parent
+    xml_rudoc[18] = xml_dict['purpose'] # назначение сооружения?
+    xml_rudoc[19] = xml_dict['floors']  # Количество этажей, в том числе подземных этажей
+    xml_rudoc[20] = xml_dict['year_commisioning'] # Год ввода в эксплуатацию по завершении строительства
+    xml_rudoc[21] = xml_dict['year_built'] # Год завершения строительства
+    # xml_rudoc[22]= xml_dict['value'] # Кадастровая стоимость ### TODO get parent
+    xml_rudoc[23] = xml_dict['land_cad_numbers'] # Кадастровые номера иных объектов недвижимости, в пределах которых расположен объект недвижимости
+    xml_rudoc[24] = str(xml_dict['room_cad_numbers']) # Кадастровые номера машино-мест расположенных в здании или сооружении
+    xml_rudoc[24] += " " + str(xml_dict['car_parking_space_cad_numbers']) # Кадастровые номера помещений расположенных в здании или сооружении
+    xml_rudoc[25] = xml_dict['permitted_use'] # Вид разрешённого использования
+    xml_rudoc[26] = xml_dict['status'] # Статус записи об объекте недвижимости
+    xml_rudoc[27] = xml_dict['special_notes'] # "особые отметки" - особые отметки
 
     with open(file_path, encoding="utf8") as file:
         xml_dict = xmltodict.parse(file.read())
@@ -100,13 +104,13 @@ def main(*args, **kwargs):
         except:
             xml_rudoc[6] = ''
         try:
-            xml_rudoc[13] = xml_dict['extract_base_params_construction']['construction_record']['params']['name']
+            xml_rudoc[17] = xml_dict['extract_base_params_construction']['construction_record']['params']['name']
         except:
-            xml_rudoc[13] = ''
+            xml_rudoc[17] = ''
         try:
-            xml_rudoc[18] = xml_dict['extract_base_params_construction']['construction_record']['cost']['value']
+            xml_rudoc[22] = xml_dict['extract_base_params_construction']['construction_record']['cost']['value']
         except:
-            xml_rudoc[18] = ''
+            xml_rudoc[22] = ''
 
     print(xml_rudoc)
     # root = etree.getroot()
@@ -121,9 +125,13 @@ def main(*args, **kwargs):
             'Дата присвоения кадастрового номера',
             'Ранее присвоенный государственный учетный номер',
             'Адрес',
-            'Тип (Основная характеристика сооружения)',
-            'Значение',
-            'Единица измерения',
+            'Основная характеристика сооружения # Площадь в кв.метрах',
+            'Основная характеристика сооружения # Площадь застройки в квадратных метрах с округлением до 0,1 квадратного метра ',
+            'Основная характеристика сооружения # Протяженность в метрах с округлением до 1 метра',
+            'Основная характеристика сооружения # Глубина в метрах с округлением до 0,1 метра',
+            'Основная характеристика сооружения # Глубина залегания в метрах с округлением до 0,1 метра',
+            'Основная характеристика сооружения # Объем в кубических метрах с округлением до 1 кубического метра',
+            'Основная характеристика сооружения # Высота в метрах с округлением до 0,1 метра',
             'Наименование',
             'Назначение сооружения',
             'Количество этажей, в том числе подземных этажей',
@@ -136,9 +144,7 @@ def main(*args, **kwargs):
             'Статус записи об объекте недвижимости',
             'Особые отметки']
 
-    row2 = ['Тип',	'Значение',	'Единица измерения']
-
-    df1 = pandas.DataFrame([[i for i in range(1,24)],[xml_rudoc[i] for i in range(1,24)],],
+    df1 = pandas.DataFrame([[i for i in range(1,28)],[xml_rudoc[i] for i in range(1,28)],],
                    columns=row1)
     writer = pandas.ExcelWriter("output.xlsx")
     df1.to_excel(writer, index=False)
