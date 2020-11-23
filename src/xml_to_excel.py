@@ -4,6 +4,7 @@ import xml.etree.ElementTree as ET
 import xmltodict
 import pandas
 
+
 def iter_docs(author):
     author_attr = author.attrib
     for doc in author.iter('document'):
@@ -13,18 +14,57 @@ def iter_docs(author):
         yield doc_dict
 
 
+def do_all(dir_path, output_xlsx):
+    if os.path.isdir(dir_path):
+        caps = ['Наименование файла',
+                'Номер выписки',
+                'Дата выписки',
+                'Кадастровый номер',
+                'Кадастровый квартал',
+                'Вид объекта недвижимости',
+                'Дата присвоения кадастрового номера',
+                'Ранее присвоенный государственный учетный номер',
+                'Адрес',
+                'Основная характеристика сооружения # Площадь в кв.метрах',
+                'Основная характеристика сооружения # Площадь застройки в квадратных метрах с округлением до 0,1 квадратного метра ',
+                'Основная характеристика сооружения # Протяженность в метрах с округлением до 1 метра',
+                'Основная характеристика сооружения # Глубина в метрах с округлением до 0,1 метра',
+                'Основная характеристика сооружения # Глубина залегания в метрах с округлением до 0,1 метра',
+                'Основная характеристика сооружения # Объем в кубических метрах с округлением до 1 кубического метра',
+                'Основная характеристика сооружения # Высота в метрах с округлением до 0,1 метра',
+                'Наименование',
+                'Назначение сооружения',
+                'Количество этажей, в том числе подземных этажей',
+                'Год ввода в эксплуатацию по завершении строительства',
+                'Год завершения строительства',
+                'Кадастровая стоимость',
+                'Кадастровые номера иных объектов недвижимости, в пределах которых расположен объект недвижимости',
+                'Кадастровые номера помещений, машино-мест, расположенных в здании или сооружении',
+                'Виды разрешенного использования',
+                'Статус записи об объекте недвижимости',
+                'Особые отметки']
+
+        df = pandas.DataFrame([[i for i in range(1, 28)],],
+                               columns=caps)
+        rcount = 1
+        for file in os.listdir(dir_path):
+            afile = os.path.join(dir_path, file)
+            df.loc[rcount] = main(afile)
+            rcount += 1
+        writer = pandas.ExcelWriter(output_xlsx)
+        df.to_excel(writer, index=False)
+        writer.save()
+
+
 def main(*args, **kwargs):
     file_path = args[0]
-    folder_path = args[1]
     print(file_path)
     # print(folder_path)
     etree = ET.parse(file_path)
     root = etree.getroot()
 
-
     # todo выбрать файлы (много)
     xml_dict = {}
-
 
     xml_tags = ['registration_number'  # Регистрационный номер
     ,'date_formation'  # Дата формирования выписки
@@ -58,13 +98,7 @@ def main(*args, **kwargs):
 
     xml_dict.update(zip(xml_tags, ['' for i in xml_tags]))
     for i in root.iter():
-
-        xml_dict[i.tag] = i.text.strip() # todo pack all xml into dict - gg ez
-        print(f"  {i.tag}  attrib: {i.text}")
-
-    def inc(x):
-        x.value += 1
-        return x.value
+        xml_dict[i.tag] = i.text.strip() #
 
     xml_rudoc = {}
     xml_rudoc[1] = os.path.split(file_path)[-1]
@@ -112,61 +146,28 @@ def main(*args, **kwargs):
         except:
             xml_rudoc[22] = ''
 
-    print(xml_rudoc)
-    # root = etree.getroot()
-    # doc_df = pandas.DataFrame(list(iter_docs(root)))
-
-    row1 = ['Наименование файла',
-            'Номер выписки',
-            'Дата выписки',
-            'Кадастровый номер',
-            'Кадастровый квартал',
-            'Вид объекта недвижимости',
-            'Дата присвоения кадастрового номера',
-            'Ранее присвоенный государственный учетный номер',
-            'Адрес',
-            'Основная характеристика сооружения # Площадь в кв.метрах',
-            'Основная характеристика сооружения # Площадь застройки в квадратных метрах с округлением до 0,1 квадратного метра ',
-            'Основная характеристика сооружения # Протяженность в метрах с округлением до 1 метра',
-            'Основная характеристика сооружения # Глубина в метрах с округлением до 0,1 метра',
-            'Основная характеристика сооружения # Глубина залегания в метрах с округлением до 0,1 метра',
-            'Основная характеристика сооружения # Объем в кубических метрах с округлением до 1 кубического метра',
-            'Основная характеристика сооружения # Высота в метрах с округлением до 0,1 метра',
-            'Наименование',
-            'Назначение сооружения',
-            'Количество этажей, в том числе подземных этажей',
-            'Год ввода в эксплуатацию по завершении строительства',
-            'Год завершения строительства',
-            'Кадастровая стоимость',
-            'Кадастровые номера иных объектов недвижимости, в пределах которых расположен объект недвижимости',
-            'Кадастровые номера помещений, машино-мест, расположенных в здании или сооружении',
-            'Виды разрешенного использования',
-            'Статус записи об объекте недвижимости',
-            'Особые отметки']
-
-    df1 = pandas.DataFrame([[i for i in range(1,28)],[xml_rudoc[i] for i in range(1,28)],],
-                   columns=row1)
-    writer = pandas.ExcelWriter("output.xlsx")
-    df1.to_excel(writer, index=False)
-    writer.save()
+    return [xml_rudoc[i] for i in range(1, 28)]
 
 
 
-    import xlsxwriter
-    workbook = xlsxwriter.Workbook("output.xlsx")
-    sheets = workbook.worksheets()
-    print(sheets)
-    worksheet = workbook.get_worksheet_by_name("Лист 1")
-
-    merge_format = workbook.add_format({
-        'bold': 1,
-        'border': 1,
-        'align': 'center',
-        'valign': 'vcenter',
-        'fg_color': 'yellow'})
-    worksheet.merge_range('A1:A2', 'Merged Cells', merge_format)
+    # import xlsxwriter
+    # workbook = xlsxwriter.Workbook("output.xlsx")
+    # sheets = workbook.worksheets()
+    # print(sheets)
+    # worksheet = workbook.get_worksheet_by_name("Лист 1")
+    #
+    # merge_format = workbook.add_format({
+    #     'bold': 1,
+    #     'border': 1,
+    #     'align': 'center',
+    #     'valign': 'vcenter',
+    #     'fg_color': 'yellow'})
+    # worksheet.merge_range('A1:A2', 'Merged Cells', merge_format)
 
 
 if __name__ == '__main__':
-    file = "D:\\PYTHON\\xml-to-excel\\report2.xml"
-    main(file, "D:\\")
+
+    # main(file, "D:\\")
+    inputf = "D:\\PYTHON\\xml-to-excel\\xmls"
+    outputf = "D:\\PYTHON\\xml-to-excel\\output.xlsx"
+    do_all(inputf, outputf)
