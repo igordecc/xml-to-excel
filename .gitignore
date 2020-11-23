@@ -2,3 +2,6 @@
 */__pycache__
 *.pdf
 *.xlsx
+*.xsd
+*.doc
+*.rar
