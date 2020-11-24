@@ -3,7 +3,7 @@ import pandas
 import xml.etree.ElementTree as ET
 import xmltodict
 import pandas
-
+import datetime
 
 def iter_docs(author):
     author_attr = author.attrib
@@ -48,12 +48,35 @@ def do_all(dir_path, output_xlsx):
                                columns=caps)
         rcount = 1
         for file in os.listdir(dir_path):
-            afile = os.path.join(dir_path, file)
-            df.loc[rcount] = main(afile)
-            rcount += 1
+            if ".xml" == os.path.splitext(file)[-1]:
+                try:
+                    print(f"файл № {rcount}")
+                    afile = os.path.join(dir_path, file)
+                    df.loc[rcount] = main(afile)
+                    rcount += 1
+                except:
+                    print(f"Ошибка чтения {file}")
         writer = pandas.ExcelWriter(output_xlsx)
         df.to_excel(writer, index=False)
         writer.save()
+
+        print("Выполнено")
+
+
+def reduct_excel(file):
+    import xlsxwriter
+    workbook = xlsxwriter.Workbook(file)
+    sheets = workbook.worksheets
+
+    worksheet = workbook.get_worksheet_by_name("Sheet1")
+
+    merge_format = workbook.add_format({
+        'bold': 1,
+        'border': 1,
+        'align': 'center',
+        'valign': 'vcenter',
+        'fg_color': 'yellow'})
+    print(worksheet)
 
 
 def main(*args, **kwargs):
@@ -74,15 +97,13 @@ def main(*args, **kwargs):
     ,'assignment_date'  # Дата присвоения кадастрового номера
     ,'old_number'  # Ранее присвоенный государственный учетный номер
     ,'readable_address'  # Адрес
-    # Основная характеристика сооружения # Тип # Значение # Единица измерения
-    , 'area'
+    , 'area'    # Основная характеристика сооружения # Тип # Значение # Единица измерения
     , 'built_up_area'
     , 'extension'
     , 'depth'
     , 'occurence_depth'
     , 'volume'
-    , 'height'
-    # -----
+    , 'height'# -----
     ,'name'  # Наименование
     ,'purpose'  # назначение сооружения?
     ,'floors'  #  Количество этажей, в том числе подземных этажей
@@ -107,8 +128,8 @@ def main(*args, **kwargs):
     xml_rudoc[4] = xml_dict['cad_number'] # Кадастровый номер
     xml_rudoc[5] = xml_dict['quarter_cad_number'] # Кадастровый квартал
     # xml_rudoc[6] = xml_dict['type'] # Вид объекта недвижимости ### TODO get parent
-    xml_rudoc[7] = xml_dict['assignment_date'] # Дата присвоения кадастрового номера
-    xml_rudoc[8] = xml_dict['old_number'] # Ранее присвоенный государственный учетный номер
+    # xml_rudoc[7] = xml_dict['assignment_date'] # Дата присвоения кадастрового номера ### TODO get parent
+    # xml_rudoc[8] = xml_dict['old_number'] # Ранее присвоенный государственный учетный номер ### TODO get parent
     xml_rudoc[9] = xml_dict['readable_address'] # Адрес
     # base_parameter много значений, пример area-70-кв. метры
     xml_rudoc[10] = xml_dict['area'] # Основная характеристика сооружения # Площадь в кв. метрах
@@ -134,9 +155,23 @@ def main(*args, **kwargs):
     with open(file_path, encoding="utf8") as file:
         xml_dict = xmltodict.parse(file.read())
         try:
-            xml_rudoc[6] = xml_dict['extract_base_params_construction']['construction_record']['object']['common_data']['type']['value']
+            value = xml_dict['extract_base_params_construction']['construction_record']['object']['common_data']['type']['value']
+            if value == "construction_record":
+                xml_rudoc[6] = value
         except:
             xml_rudoc[6] = ''
+        try:
+            dt = xml_dict['extract_base_params_construction']['construction_record']['record_info']['registration_date'] # 2012-07-05T00:00:00+04:00
+            dt = datetime.datetime.strptime(dt, "%Y-%m-%dT%H:%M:%S%z")
+            xml_rudoc[7] = str(dt.date())  # Дата присвоения кадастрового номера
+        except :
+            print(sys.exc_info()[0].__name__) #"custom exception"
+            print(sys.exc_info()[0].__dict__) #"custom exception"
+            xml_rudoc[7] = ''
+        try:
+            xml_rudoc[8] = xml_dict['extract_base_params_construction']['construction_record']['cad_links']['old_numbers']['old_number']['number_type']['value'] + " " + xml_dict['extract_base_params_construction']['construction_record']['cad_links']['old_numbers']['old_number']['number']  # ранее присвоенный кадастровый номер
+        except:
+            xml_rudoc[8] = ''
         try:
             xml_rudoc[17] = xml_dict['extract_base_params_construction']['construction_record']['params']['name']
         except:
@@ -150,24 +185,10 @@ def main(*args, **kwargs):
 
 
 
-    # import xlsxwriter
-    # workbook = xlsxwriter.Workbook("output.xlsx")
-    # sheets = workbook.worksheets()
-    # print(sheets)
-    # worksheet = workbook.get_worksheet_by_name("Лист 1")
-    #
-    # merge_format = workbook.add_format({
-    #     'bold': 1,
-    #     'border': 1,
-    #     'align': 'center',
-    #     'valign': 'vcenter',
-    #     'fg_color': 'yellow'})
-    # worksheet.merge_range('A1:A2', 'Merged Cells', merge_format)
-
-
 if __name__ == '__main__':
 
     # main(file, "D:\\")
-    inputf = "D:\\PYTHON\\xml-to-excel\\xmls"
+    inputf = "D:\\PYTHON\\xml-to-excel\\xml"
     outputf = "D:\\PYTHON\\xml-to-excel\\output.xlsx"
-    do_all(inputf, outputf)
+    # do_all(inputf, outputf)
+    reduct_excel(outputf)

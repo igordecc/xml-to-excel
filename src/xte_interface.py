@@ -8,6 +8,7 @@ import traceback
 
 from PyQt5.QtGui import QIcon
 
+
 class UI(QWidget):
 
     def __init__(self):
@@ -16,21 +17,26 @@ class UI(QWidget):
         self.initUI()
 
     def initUI(self):
-        chooseb = QPushButton("выбрать csv")
+        choose_in_b = QPushButton("выбрать директорию xml")
+        choose_out_b = QPushButton("выбрать директорию вывода")
         runb = QPushButton("добавить надпись")
 
-        chooseb.addAction(QAction(QIcon('open.png'), 'Open', self))
-        chooseb.setStatusTip('Выбрать csv файл со списком скриншотов')
-        chooseb.clicked.connect(self.showDialog)
+        choose_in_b.addAction(QAction(QIcon('open.png'), 'Open', self))
+        choose_in_b.setStatusTip('Выберите директорию с xml файлами')
+        choose_in_b.clicked.connect(self.chooseInDialog)
+
+        choose_out_b.addAction(QAction(QIcon('open.png'), 'Open', self))
+        choose_out_b.setStatusTip('Выберите директорию с для сохранение excel файла с выгрузкой данных')
+        choose_out_b.clicked.connect(self.chooseOutDialog)
 
         runb.addAction(QAction(QIcon('run.png'), 'Run', self))
         runb.setStatusTip('Запустить программу')
         runb.clicked.connect(self.runProgram)
 
         vbox = QVBoxLayout()
-        vbox.addWidget(chooseb)
+        vbox.addWidget(choose_in_b)
+        vbox.addWidget(choose_out_b)
         vbox.addWidget(runb)
-
 
         self.setLayout(vbox)
         self.setFixedSize(280, 180)
@@ -38,14 +44,24 @@ class UI(QWidget):
         self.setWindowTitle('Добавить надпись')
         self.show()
 
-    def showDialog(self):
-        fname = QFileDialog.getOpenFileName(self, 'Open file', '/home')[0]
-        print("Выбрано")
-        self.fname = fname
+    def chooseInDialog(self):
+        self.dirin = QFileDialog.getExistingDirectory(None, "Выберете папку")
+        # fname = QFileDialog.getOpenFileName(self, 'Open file', '/home')[0]
+        print(f"Выбраны xml {self.dirin}")
 
+    def chooseOutDialog(self):
+        self.dirout = QFileDialog.getExistingDirectory(None, "Выберете папку")
+        self.fileout =os.path.join(self.dirout, "Вывод.xlsx")
+        print(f"Выбран вывод excel {self.dirout}")
 
     def runProgram(self):
-        xml_to_excel.main(file=self.fname)
+        if not hasattr(self, "dirin"):
+            print("Выберите xml")
+        elif not hasattr(self, "dirout"):
+            print("Выберите excel")
+        else:
+            print("Выполняется...")
+            xml_to_excel.do_all(self.dirin, self.fileout)
 
     def setUp(self):
         self.no_exceptions = True
