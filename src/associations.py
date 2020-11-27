@@ -44,6 +44,78 @@ def main(file_path):
         ru_analog['contours'] = "Описание местоположения контура сооружения"
         ru_analog['special_notes'] = "Особые отметки"
 
+        ru_analog['registration_date'] = "Дата постановки на учет/ регистрации"
+        ru_analog['cancel_date'] = "Дата снятия с учета/регистрации"
+
+        ru_analog['common_data'] = "Общие сведения"
+
+        ru_analog['land_cad_numbers'] = "Кадастровые номера иных объектов недвижимости (земельных участков), в пределах которых расположен объект недвижимости"
+        ru_analog['room_cad_numbers'] = "Кадастровые номера помещений, расположенных в объекте недвижимости"
+        ru_analog['car_parking_space_cad_numbers'] = "Кадастровые номера машиномест, расположенных в объекте недвижимости"
+        ru_analog['old_numbers'] = "Ранее присвоенные номера"
+
+        ru_analog['land_cad_number'] = "Кадастровый номер объекта недвижимости (земельного участка), в пределах которого расположен объект недвижимости"
+
+        ru_analog['room_cad_number'] = "Кадастровый номер помещения, расположенного в объекте недвижимости"
+
+        ru_analog['car_parking_place_cad_number'] = "Кадастровый номер машиноместа, расположенного в объекте недвижимости"
+
+        ru_analog['base_parameters'] = "Основные характеристики"
+        ru_analog['floors'] = "Количество этажей (в том числе подземных)"
+        ru_analog['underground_floors'] = "Количество подземных этажей"
+        ru_analog['purpose'] = "Назначение сооружения"
+        ru_analog['name'] = "Наименование сооружения"
+        ru_analog['year_built'] = "Год завершения строительства"
+        ru_analog['year_commisioning'] = "Год ввода в эксплуатацию по завершении строительства"
+        ru_analog['permitted_uses'] = "Вид(ы) разрешенного использования"
+
+        ru_analog['base_parameter'] = "Основная характеристика"
+
+        ru_analog['area'] = "Площадь в кв. метрах"
+        ru_analog['built_up_area'] = "Площадь застройки в квадратных метрах с округлением"
+        ru_analog['extension'] = "до 0,1 квадратного метра"
+        ru_analog['depth'] = "Протяженность в метрах с округлением до 1 метра"
+        ru_analog['occurence_depth'] = "Глубина в метрах с округлением до 0,1 метра"
+        ru_analog['volume'] = "Глубина залегания в метрах с округлением до 0,1 метра"
+        ru_analog['height'] = "Объем в кубических метрах с округлением до 1 кубического метра"
+
+        ru_analog['value'] = "Стоимость (руб.)"
+
+        ru_analog['object_part'] = "Сведения о части объекта недвижимости"
+
+        ru_analog['part_number'] = "Порядковый номер части"
+        ru_analog['content_restrictions'] = "Содержание ограничений"
+
+        ru_analog['data_registration'] = "Сведения о регистрации"
+        ru_analog['reg_numb_border'] = "Реестровый номер границы"
+
+        ru_analog['reg_number'] = "Номер"
+
+        ru_analog['cad_number'] = "Кадастровый номер"
+        ru_analog['quarter_cad_number'] = "Номер кадастрового квартала"
+        ru_analog['type'] = "Вид объекта недвижимости"
+
+        ru_analog['number'] = "Кадастровый номер"
+
+        ru_analog['old_number'] = "Ранее присвоенный номер"
+        ru_analog['number_type'] = "Вид номера"
+        ru_analog['number'] = "Номер"
+        ru_analog['assignment_date'] = "Дата присвоения"
+        ru_analog['assigner'] = "Организация, присвоившая номер"
+
+        ru_analog['permitted_use'] = "Вид разрешенного использования"
+
+        ru_analog['name'] = "Наименование вида использования"
+        ru_analog['code'] = "Код справочника НСИ"
+        ru_analog['value'] = "Текстовое значение, соответствующее коду справочника НСИ"
+
+        ru_analog['restriction_encumbrance_number'] = "Номер регистрации/реестровой записи"
+        ru_analog['registration_date'] = "Дата регистрации"
+
+        ru_analog['number'] = "Номер реестровой записи"
+        ru_analog['right_number'] = "Номер регистрации ограничения права или обременения ОН"
+
+        ru_analog[''] = ""
         ru_analog[''] = ""
 
 
