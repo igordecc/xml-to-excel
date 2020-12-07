@@ -1,3 +1,9 @@
+"""
+contain function to transfer specific info from xml to excel
+- for single file - main()
+- for directory with files - do_all()
+"""
+
 import os, sys
 import pandas
 import xml.etree.ElementTree as ET
@@ -121,7 +127,7 @@ def main(*args, **kwargs):
     xml_rudoc[1] = os.path.split(file_path)[-1]
     xml_rudoc[2] = xml_dict['registration_number'] # Регистрационный номер
     xml_rudoc[3] = xml_dict['date_formation'] # Дата формирования выписки
-    xml_rudoc[4] = xml_dict['cad_number'] # Кадастровый номер
+    # xml_rudoc[4] = xml_dict['cad_number'] # Кадастровый номер
     xml_rudoc[5] = xml_dict['quarter_cad_number'] # Кадастровый квартал
     # xml_rudoc[6] = xml_dict['type'] # Вид объекта недвижимости ### TODO get parent
     # xml_rudoc[7] = xml_dict['assignment_date'] # Дата присвоения кадастрового номера ### TODO get parent
@@ -157,6 +163,11 @@ def main(*args, **kwargs):
 
     with open(file_path, encoding="utf8") as file:
         xml_dict = xmltodict.parse(file.read())
+        try:
+            value = xml_dict['extract_base_params_construction']['construction_record']['object']['common_data']['cad_number']
+            xml_rudoc[4] = value
+        except:
+            xml_rudoc[4] = ''
         try:
             value = xml_dict['extract_base_params_construction']['construction_record']['object']['common_data']['type']['value']
             if value == "construction_record":

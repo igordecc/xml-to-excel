@@ -1,3 +1,8 @@
+"""
+file that associate fields and ru-names or fields
+
+doesnt work correctly, because don't have hierarhical structure;
+"""
 import xmltodict
 import xml
 
