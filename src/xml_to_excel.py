@@ -139,20 +139,20 @@ def main(*args, **kwargs):
     # xml_rudoc[12] = xml_dict['extension'] # Основная характеристика сооружения # Протяженность в метрах с округлением до 1 метра
     # xml_rudoc[13] = xml_dict['depth'] # Основная характеристика сооружения # Глубина в метрах с округлением до 0,1 метра
     # xml_rudoc[14] = xml_dict['occurence_depth'] # Основная характеристика сооружения # Глубина залегания в метрах с округлением до 0,1 метра
-    xml_rudoc[15] = xml_dict['volume'] # Основная характеристика сооружения # Объем в кубических метрах с округлением до 1 кубического метра
-    xml_rudoc[16] = xml_dict['height'] # Основная характеристика сооружения # Высота в метрах с округлением до 0,1 метра
-    # xml_rudoc[17] = xml_dict['name'] # Наименование (сооружения?) ### TODO get parent
-    xml_rudoc[18] = xml_dict['purpose'] # назначение сооружения?
-    xml_rudoc[19] = xml_dict['floors']  # Количество этажей, в том числе подземных этажей
-    xml_rudoc[20] = xml_dict['year_commisioning'] # Год ввода в эксплуатацию по завершении строительства
-    xml_rudoc[21] = xml_dict['year_built'] # Год завершения строительства
+    # xml_rudoc[15] = xml_dict['volume'] # Основная характеристика сооружения # Объем в кубических метрах с округлением до 1 кубического метра
+    # xml_rudoc[16] = xml_dict['height'] # Основная характеристика сооружения # Высота в метрах с округлением до 0,1 метра
+    # xml_rudoc[17] = xml_dict['name'] # Наименование (сооружения?)
+    # xml_rudoc[18] = xml_dict['purpose'] # назначение сооружения?
+    # xml_rudoc[19] = xml_dict['floors']  # Количество этажей, в том числе подземных этажей
+    # xml_rudoc[20] = xml_dict['year_commisioning'] # Год ввода в эксплуатацию по завершении строительства
+    # xml_rudoc[21] = xml_dict['year_built'] # Год завершения строительства
     # xml_rudoc[22]= xml_dict['value'] # Кадастровая стоимость ### TODO get parent
     # xml_rudoc[23] = xml_dict['land_cad_numbers'] # Кадастровые номера иных объектов недвижимости, в пределах которых расположен объект недвижимости
     # xml_rudoc[24] = str(xml_dict['room_cad_numbers']) # Кадастровые номера машино-мест расположенных в здании или сооружении
     # xml_rudoc[24] += " " + str(xml_dict['car_parking_space_cad_numbers']) # Кадастровые номера помещений расположенных в здании или сооружении
-    xml_rudoc[25] = xml_dict['permitted_uses'] # Вид разрешённого использования
-    xml_rudoc[26] = xml_dict['status'] # Статус записи об объекте недвижимости
-    xml_rudoc[27] = xml_dict['special_notes'] # "особые отметки" - особые отметки
+    # xml_rudoc[25] = xml_dict['permitted_uses'] # Вид разрешённого использования
+    # xml_rudoc[26] = xml_dict['status'] # Статус записи об объекте недвижимости
+    # xml_rudoc[27] = xml_dict['special_notes'] # "особые отметки" - особые отметки
     # xml_rudoc[28] = '' #xml_dict['right_record'] # сведенья о правах
     # xml_rudoc[29] = '' #xml_dict['ownerless_right_records'] # Сведения о праве (бесхозяйное имущество)
     # xml_rudoc[28] = xml_dict['record_info'] # "Дата гос регистрации
@@ -243,6 +243,22 @@ def main(*args, **kwargs):
         except:
             xml_rudoc[17] = ''
         try:
+            xml_rudoc[18] = xml_dict['extract_base_params_construction']['construction_record']['params']['purpose']
+        except:
+            xml_rudoc[18] = ''
+        try:
+            xml_rudoc[19] = xml_dict['extract_base_params_construction']['construction_record']['params']['floors']
+        except:
+            xml_rudoc[19] = ''
+        try:
+            xml_rudoc[20] = xml_dict['extract_base_params_construction']['construction_record']['params']['year_commisioning']
+        except:
+            xml_rudoc[20] = ''
+        try:
+            xml_rudoc[21] = xml_dict['extract_base_params_construction']['construction_record']['params']['year_built']
+        except:
+            xml_rudoc[21] = ''
+        try:
             xml_rudoc[22] = xml_dict['extract_base_params_construction']['construction_record']['cost']['value']
         except:
             xml_rudoc[22] = ''
@@ -289,6 +305,15 @@ def main(*args, **kwargs):
         except:
             xml_rudoc[25] = ''
 
+
+        try:
+            xml_rudoc[26] = xml_dict['extract_base_params_construction']['status']
+        except:
+            xml_rudoc[26] = ''
+        try:
+            xml_rudoc[27] = xml_dict['extract_base_params_construction']['construction_record']['special_notes']
+        except:
+            xml_rudoc[27] = ''
         try:
             rights = xml_dict['extract_base_params_construction']['right_records']
             xml_rudoc[28] = str(dict(rights))
