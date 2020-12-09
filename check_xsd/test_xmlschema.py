@@ -7,7 +7,7 @@ import xmltodict
 
 def check_file(file):
     xsd_main_file = "extract_base_params_construction_v01.xsd"
-    xsd_folder = "D:\\PYTHON\\xml-to-excel\\src\\patterns\\xsd_files\\"
+    xsd_folder = "D:\\PYTHON\\xml-to-excel\\check_xsd\\xsd_files\\"
     xsd_main = os.path.join(xsd_folder, xsd_main_file)
     schema = xmlschema.XMLSchema(xsd_main, base_url=xsd_folder)
 
@@ -25,7 +25,7 @@ def main():
 def watch():
     file = "D:\\PYTHON\\xml-to-excel\\xml\\1_report1 (404).xml"
     xsd_main_file = "extract_base_params_construction_v01.xsd"
-    xsd_folder = "D:\\PYTHON\\xml-to-excel\\src\\patterns\\xsd_files\\"
+    xsd_folder = "D:\\PYTHON\\xml-to-excel\\check_xsd\\xsd_files\\"
     xsd_main = os.path.join(xsd_folder, xsd_main_file)
     schema = xmlschema.XMLSchema(xsd_main, base_url=xsd_folder)
 

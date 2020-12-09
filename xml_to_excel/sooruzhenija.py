@@ -14,16 +14,7 @@ from collections.abc import Iterable
 from collections import OrderedDict
 
 
-def iter_docs(author):
-    author_attr = author.attrib
-    for doc in author.iter('document'):
-        doc_dict = author_attr.copy()
-        doc_dict.update(doc.attrib)
-        doc_dict['data'] = doc.text
-        yield doc_dict
-
-
-def do_all(dir_path, output_xlsx):
+def xml_to_excel(dir_path, output_xlsx):
     if os.path.isdir(dir_path):
         caps = ['Наименование файла',
                 'Номер выписки',
@@ -79,52 +70,7 @@ def do_all(dir_path, output_xlsx):
 
 
 def main(*args, **kwargs):
-    file_path = args[0]
-    print(file_path)
-    # print(folder_path)
-    etree = ET.parse(file_path)
-    root = etree.getroot()
-
-    # todo выбрать файлы (много)
-    xml_dict = {}
-
-    xml_tags = ['registration_number'  # Регистрационный номер
-    ,'date_formation'  # Дата формирования выписки
-    ,'cad_number'  # Кадастровый номер
-    ,'quarter_cad_number'  # Кадастровый квартал
-    ,'type'  # Вид объекта недвижимости
-    ,'assignment_date'  # Дата присвоения кадастрового номера
-    ,'old_number'  # Ранее присвоенный государственный учетный номер
-    ,'readable_address'  # Адрес
-    , 'area'    # Основная характеристика сооружения # Тип # Значение # Единица измерения
-    , 'built_up_area'
-    , 'extension'
-    , 'depth'
-    , 'occurence_depth'
-    , 'volume'
-    , 'height'# -----
-    ,'name'  # Наименование
-    ,'purpose'  # назначение сооружения?
-    ,'floors'  #  Количество этажей, в том числе подземных этажей
-    ,'year_commisioning'  # Год ввода в эксплуатацию по завершении строительства
-    ,'year_built'  # Год завершения строительства
-    ,'value'  # Кадастровая стоимость
-    ,'land_cad_numbers'  # Кадастровые номера иных объектов недвижимости, в пределах которых расположен объект недвижимости
-    ,'room_cad_numbers'  # Кадастровые номера машино-мест расположенных в здании или сооружении
-    ,'car_parking_space_cad_numbers'  # Кадастровые номера помещений расположенных в здании или сооружении
-    ,'permitted_uses'  # Вид разрешённого использования
-    ,'status'  # Статус записи об объекте недвижимости
-    ,'special_notes' # "особые отметки" - особые отметки
-    ,'right_record'
-    ,'ownerless_right_records'                # Сведения о праве и правообладателях
-                ]
-
-    xml_dict.update(zip(xml_tags, ['' for i in xml_tags]))
-    for i in root.iter():
-        xml_dict[i.tag] = i.text.strip() #
-
-    xml_rudoc = {}.fromkeys([i for i in range(1, 32+1)], "")
-    xml_rudoc[1] = os.path.split(file_path)[-1]
+    """
     # xml_rudoc[2] = xml_dict['registration_number'] # Регистрационный номер
     # xml_rudoc[3] = xml_dict['date_formation'] # Дата формирования выписки
     # xml_rudoc[4] = xml_dict['cad_number'] # Кадастровый номер
@@ -161,6 +107,16 @@ def main(*args, **kwargs):
     # xml_rudoc[31] = xml_dict['underlying_documents'] # "Документы-основания
     # xml_rudoc[32] = xml_dict['third_party_consents'] # "Сведения об осуществлении государственной регистрации сделки, права, ограничения права, совершенных без необходимого в силу закона согласия третьего лица, органа
 
+    :param args:
+    :param kwargs:
+    :return:
+    """
+    file_path = args[0]
+    print(file_path)
+
+    xml_rudoc = {}.fromkeys([i for i in range(1, 32+1)], "")
+    xml_rudoc[1] = os.path.split(file_path)[-1]
+
 
     with open(file_path, encoding="utf8") as file:
         xml_dict = xmltodict.parse(file.read())
@@ -192,8 +148,6 @@ def main(*args, **kwargs):
             xml_rudoc[7] = str(dt.date())  # Дата присвоения кадастрового номера
             dt = None
         except :
-            print("arg 7 " + sys.exc_info()[0].__name__) #"custom exception"
-            print("arg 7 " + str(sys.exc_info()[0].__dict__)) #"custom exception"
             xml_rudoc[7] = ''
         try:
             old_numbers = xml_dict['extract_base_params_construction']['construction_record']['cad_links']['old_numbers']["old_number"]
@@ -204,7 +158,6 @@ def main(*args, **kwargs):
             else:
                 xml_rudoc[8] = old_numbers['number_type']['value'] + " " + old_numbers['number']  # ранее присвоенный кадастровый номер
         except:
-            print("arg 8 "+sys.exc_info()[0].__name__)  # "custom exception"
             xml_rudoc[8] = ''
         try:
             xml_rudoc[9] = xml_dict['extract_base_params_construction']['construction_record']['address_location']['address']['readable_address']
@@ -291,16 +244,16 @@ def main(*args, **kwargs):
             else:
                 xml_rudoc[24] = land_cad_numbers['cad_number']
         except:
-            ...
-            # print("no car_parking_space_cad_number ")
+            ...     # cause - append this column to the previous
+
         try:
             print(xml_dict['extract_base_params_construction']['construction_record']['params']['permitted_uses'])
             land_cad_numbers = xml_dict['extract_base_params_construction']['construction_record']['params']['permitted_uses']
-            if isinstance(land_cad_numbers, list):
+            if isinstance(land_cad_numbers, list): # when there are many entries - its a list
                 xml_rudoc[25] = ''
                 for land_cad_number in land_cad_numbers:
                     xml_rudoc[25] += land_cad_number['permitted_use']['name'] +" ; "
-            else:
+            else:                                  # when there is one entry - its not
                 xml_rudoc[25] = land_cad_numbers['permitted_use']['name']
         except:
             xml_rudoc[25] = ''
@@ -316,7 +269,7 @@ def main(*args, **kwargs):
             xml_rudoc[27] = ''
         try:
             rights = xml_dict['extract_base_params_construction']['right_records']
-            xml_rudoc[28] = str(dict(rights))
+            xml_rudoc[28] = str(dict(rights))   # to not read many other fields - pass them, as they are in xml
         except:
             xml_rudoc[28] = ''
 
@@ -329,10 +282,9 @@ def main(*args, **kwargs):
     return [xml_rudoc[i] for i in range(1, COL_NUM)]
 
 
-
 if __name__ == '__main__':
 
     # main(file, "D:\\")
-    inputf = "D:\\PYTHON\\xml-to-excel\\xml"
+    inputdir = "D:\\PYTHON\\xml-to-excel\\xml"
     outputf = "D:\\PYTHON\\xml-to-excel\\Вывод.xlsx"
-    do_all(inputf, outputf)
+    xml_to_excel(inputdir, outputf)
