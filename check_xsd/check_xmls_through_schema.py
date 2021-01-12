@@ -37,7 +37,7 @@ def watch_etree(
     wdict = schema.to_dict(etree)
     print(wdict)
 
-# =========
+# ======== EXAMPLES
 def check_сооружения():
     check_files(xmls_to_check="D:\\PYTHON\\xml-to-excel\\xml_сооружения\\",
                 xsd_main_file="extract_base_params_construction_v01.xsd",
@@ -54,7 +54,10 @@ def check_здания():
 
 if __name__ == '__main__':
     pass
-    # check_сооружения()
+    check_files(xmls_to_check="D:\\PYTHON\\xml-to-excel\\xml_сооружения_29.12.2020\\",
+                xsd_main_file="extract_base_params_construction_v01.xsd",
+                xsd_folder="D:\\PYTHON\\xml-to-excel\\xsd_сооружения\\xsd_files\\"
+                )
     # check_здания()
 
 

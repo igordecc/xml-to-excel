@@ -14,31 +14,48 @@ class UI(QWidget):
 
     def __init__(self):
         super().__init__()
-        self.init_ui()
 
-    def init_ui(self):
+        self.pre_configuration()
+        self.init_ui()
+        self.final_configuration()
+
+    def pre_configuration(self):
+        self.vbox = QVBoxLayout()
+
+    def button_1(self):
         chooseb = QPushButton("выбрать xml файл")
-        runb = QPushButton("трансформировать")
-        savef = QPushButton("выбрать папку сохранения")
 
         chooseb.addAction(QAction(QIcon('open.png'), 'Open', self))
         chooseb.setStatusTip('Выбрать csv файл со списком скриншотов')
         chooseb.clicked.connect(self.choose_xml_file_dialog)
 
+        self.vbox.addWidget(chooseb)
+
+    def button_2(self):
+        runb = QPushButton("трансформировать")
+
         runb.addAction(QAction(QIcon('run.png'), 'Run', self))
         runb.setStatusTip('Запустить программу')
         runb.clicked.connect(self.run_program)
+
+        self.vbox.addWidget(runb)
+
+    def button_3(self):
+        savef = QPushButton("выбрать папку сохранения")
 
         savef.addAction(QAction(QIcon('save_folder.png'), 'save_folder', self))
         savef.setStatusTip('Выберите папку для сохранения')
         savef.clicked.connect(self.save_folder_dialog)
 
-        vbox = QVBoxLayout()
-        vbox.addWidget(chooseb)
-        vbox.addWidget(savef)
-        vbox.addWidget(runb)
+        self.vbox.addWidget(savef)
 
-        self.setLayout(vbox)
+    def init_ui(self):
+        self.button_1()
+        self.button_2()
+        self.button_3()
+
+    def final_configuration(self):
+        self.setLayout(self.vbox)
         self.setFixedSize(280, 180)
 
         self.setWindowTitle('Добавить надпись')

@@ -279,12 +279,14 @@ def main(*args, **kwargs):
         except:
             xml_rudoc[29] = ''
 
+
     return [xml_rudoc[i] for i in range(1, COL_NUM)]
+
 
 
 if __name__ == '__main__':
 
     # main(file, "D:\\")
-    inputdir = "D:\\PYTHON\\xml-to-excel\\xml"
+    inputdir = "D:\\PYTHON\\xml-to-excel\\xml_сооружения_29.12.2020"
     outputf = "D:\\PYTHON\\xml-to-excel\\Вывод.xlsx"
     xml_to_excel(inputdir, outputf)
