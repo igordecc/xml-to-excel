@@ -1,12 +1,16 @@
-import zdanija_ons
 import sooruzhenija
+import zdanija
+import ons
+import mashino_mesta
 import pomeshhenija
 import zemelnije_uchastki
 
 module_map = {
-        "Здания": zdanija_ons.run,
+        "Здания": zdanija.run,
         "Сооружения": sooruzhenija.run,
-        "Помещения и машино-места": pomeshhenija.run,
+        "ОНС": ons.run,
+        "Машино-места": mashino_mesta.run,
+        "Помещения": pomeshhenija.run,
         "Земельные участки": zemelnije_uchastki.run,
     }
 

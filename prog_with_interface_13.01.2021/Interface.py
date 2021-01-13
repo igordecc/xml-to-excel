@@ -27,10 +27,13 @@ class UI(QWidget):
 
     def drop_down_menu(self):
         self.dropdown = QComboBox()
-        self.dropdown.addItems(["Здания",
-                   "Помещения и машино-места",
-                   "Сооружения",
-                   "Земельные участки"
+        self.dropdown.addItems([
+                               "Здания",
+                               "ОНС",
+                               "Помещения",
+                               "Машино-места",
+                               "Сооружения",
+                               "Земельные участки"
             ])
         self.module_name = self.dropdown.itemText(0)
         self.dropdown.activated.connect(self.selection_changed_dialog)
@@ -53,7 +56,7 @@ class UI(QWidget):
         self.vbox.addWidget(savef)
 
     def button_3(self):
-        runb = QPushButton("трансформировать")
+        runb = QPushButton("Конвертировать")
         runb.addAction(QAction(QIcon('run.png'), 'Run', self))
         runb.setStatusTip('Запустить программу')
         runb.clicked.connect(self.run_program)
