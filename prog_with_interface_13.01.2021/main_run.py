@@ -5,7 +5,7 @@ import mashino_mesta
 import pomeshhenija
 import zemelnije_uchastki
 
-module_map = {
+use_module = {
         "Здания": zdanija.run,
         "Сооружения": sooruzhenija.run,
         "ОНС": ons.run,
@@ -16,7 +16,7 @@ module_map = {
 
 
 def run(module_name, source_directory, save_directory):
-    module_map[module_name](source_directory, save_directory)
+    use_module[module_name](source_directory, save_directory)
 
 
 if __name__ == '__main__':

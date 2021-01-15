@@ -283,13 +283,13 @@ def main(*args, **kwargs):
 
 
 def run(input_dir, output_dir):
-    xml_to_excel(input_dir, os.path.join(output_dir, "Вывод.xlsx"))
-    print(os.path.join(output_dir, "Вывод.xlsx"))
+    xml_to_excel(input_dir, os.path.join(output_dir, "Выписки_Сооружения.xlsx"))
+    print(os.path.join(output_dir, "Выписки_Сооружения.xlsx"))
 
 
 if __name__ == '__main__':
 
     # main(file, "D:\\")
     inputdir = "D:\\PYTHON\\xml-to-excel\\xml_сооружения_29.12.2020"
-    outputf = "D:\\PYTHON\\xml-to-excel\\Вывод.xlsx"
+    outputf = "D:\\PYTHON\\xml-to-excel\\Выписки_Сооружения.xlsx"
     xml_to_excel(inputdir, outputf)

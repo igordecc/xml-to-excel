@@ -1,6 +1,6 @@
 """
-NOT FINISHED
-TODO FINISH
+FINISHED
+NOT TESTED
 
 contain function to transfer specific info from xml to excel
 - for single file - main()
@@ -8,51 +8,47 @@ contain function to transfer specific info from xml to excel
 """
 
 import os, sys
-import pandas
-import xml.etree.ElementTree as ET
 import xmltodict
 import pandas
 import datetime
-from collections.abc import Iterable
-from collections import OrderedDict
 
 
-def xml_to_excel(dir_path, output_xlsx): ## TODO stop on Шаблон для зданий
+def xml_to_excel(dir_path, output_xlsx): ##
     if os.path.isdir(dir_path):
         caps = [
-'Наименование файла',
-'Номер выписки',
-'Дата выписки',
-'Вид объекта недвижимости',
-'Дата присвоения кадастрового номера',
-'Кадастровый номер',
-'Кадастровый квартал',
-'Ранее присвоенный государственный учетный номер',
-'Адрес',
-'Площадь',
-'Назначение',
-'Наименование',
-'Количество этажей, в том числе подземных этажей',
-'Год ввода в эксплуатацию',
-'Год завершения строительства',
-'Кадастровая стоимость',
-'Кадастровые номера иных объектов недвижимости, в пределах которых расположен объект недвижимости',
-'Кадастровые номера помещений, машино-мест, расположенных в здании или сооружении',
-'Виды разрешенного использования',
-'Статус записи об объекте недвижимости',
-'Особые отметки',
-'Правообладатель (правообладатели)',
-'Вид, номер и дата государственной регистрации права',
-'Документы-основания',
-'Ограничение прав и обременение объекта недвижимости',
-'Сведения о наличии решения об изъятии объекта недвижимости для государственных и муниципальных нужд',
-'Сведения об осуществлении государственной регистрации прав без необходимого в силу закона согласия третьего лица, органа',
+'Наименование файла',#1
+'Номер выписки',#2
+'Дата выписки',#3
+'Вид объекта недвижимости',#4
+'Дата присвоения кадастрового номера',#5
+'Кадастровый номер',#6
+'Кадастровый квартал',#7
+'Ранее присвоенный государственный учетный номер',#8
+'Адрес',#9
+'Площадь',#10
+'Назначение',#11
+'Наименование',#12
+'Количество этажей, в том числе подземных этажей',#13
+'Год ввода в эксплуатацию',#14
+'Год завершения строительства',#15
+'Кадастровая стоимость',#16
+'Кадастровые номера иных объектов недвижимости, в пределах которых расположен объект недвижимости',#17
+'Кадастровые номера помещений, машино-мест, расположенных в здании или сооружении',#18
+'Виды разрешенного использования',#19
+'Статус записи об объекте недвижимости',#20
+'Особые отметки',#21
+'Правообладатель (правообладатели)',#22
+'Вид, номер и дата государственной регистрации права',#23
+'Документы-основания',#24
+'Ограничение прав и обременение объекта недвижимости',#25
+'Сведения о наличии решения об изъятии объекта недвижимости для государственных и муниципальных нужд',#26
+'Сведения об осуществлении государственной регистрации прав без необходимого в силу закона согласия третьего лица, органа',#27
                 ]
 
         global COL_NUM
-        COL_NUM = 30
+        COL_NUM = len(caps)
 
-        df = pandas.DataFrame([[i for i in range(1, COL_NUM)],],
+        df = pandas.DataFrame([[i for i in range(1, COL_NUM+1)],],
                                columns=caps)
         rcount = 1
         for file in os.listdir(dir_path):
@@ -76,7 +72,7 @@ def main(*args, **kwargs):
     file_path = args[0]
     print(file_path)
 
-    xml_rudoc = {}.fromkeys([i for i in range(1, 32+1)], "")
+    xml_rudoc = {}.fromkeys([i for i in range(1, 27+1)], "")
     xml_rudoc[1] = os.path.split(file_path)[-1]
 
     with open(file_path, encoding="utf8") as file:
@@ -130,59 +126,58 @@ def main(*args, **kwargs):
             xml_rudoc[10] = xml_dict['extract_base_params_build']['construction_record']['params']['base_parameters']['base_parameter']['area']
         except:
             xml_rudoc[10] = ''
-
         try:
-            xml_rudoc[17] = xml_dict['extract_base_params_build']['construction_record']['params']['name']
+            xml_rudoc[11] = xml_dict['extract_base_params_build']['construction_record']['params']['purpose']
         except:
-            xml_rudoc[17] = ''
+            xml_rudoc[11] = ''
         try:
-            xml_rudoc[18] = xml_dict['extract_base_params_build']['construction_record']['params']['purpose']
+            xml_rudoc[12] = xml_dict['extract_base_params_build']['construction_record']['params']['name']
         except:
-            xml_rudoc[18] = ''
+            xml_rudoc[12] = ''
         try:
-            xml_rudoc[19] = xml_dict['extract_base_params_build']['construction_record']['params']['floors']
+            xml_rudoc[13] = xml_dict['extract_base_params_build']['construction_record']['params']['floors']
         except:
-            xml_rudoc[19] = ''
+            xml_rudoc[13] = ''
         try:
-            xml_rudoc[20] = xml_dict['extract_base_params_build']['construction_record']['params']['year_commisioning']
+            xml_rudoc[14] = xml_dict['extract_base_params_build']['construction_record']['params']['year_commisioning']
         except:
-            xml_rudoc[20] = ''
+            xml_rudoc[14] = ''
         try:
-            xml_rudoc[21] = xml_dict['extract_base_params_build']['construction_record']['params']['year_built']
+            xml_rudoc[15] = xml_dict['extract_base_params_build']['construction_record']['params']['year_built']
         except:
-            xml_rudoc[21] = ''
+            xml_rudoc[15] = ''
         try:
-            xml_rudoc[22] = xml_dict['extract_base_params_build']['construction_record']['cost']['value']
+            xml_rudoc[16] = xml_dict['extract_base_params_build']['construction_record']['cost']['value']
         except:
-            xml_rudoc[22] = ''
+            xml_rudoc[16] = ''
         try:
             land_cad_numbers = xml_dict['extract_base_params_build']['construction_record']['cad_links']['land_cad_numbers']['land_cad_number']
             if isinstance(land_cad_numbers, list):
-                xml_rudoc[23] = ''
+                xml_rudoc[17] = ''
                 for land_cad_number in land_cad_numbers:
-                    xml_rudoc[23] += land_cad_number['cad_number'] +" ; "
+                    xml_rudoc[17] += land_cad_number['cad_number'] +" ; "
             else:
-                xml_rudoc[23] = land_cad_numbers['cad_number']
+                xml_rudoc[17] = land_cad_numbers['cad_number']
         except:
-            xml_rudoc[23] = ''
+            xml_rudoc[17] = ''
         try:
             print(xml_dict['extract_base_params_build']['construction_record']['cad_links']['room_cad_numbers'])
             land_cad_numbers = xml_dict['extract_base_params_build']['construction_record']['cad_links']['room_cad_numbers']['room_cad_number']
             if isinstance(land_cad_numbers, list):
-                xml_rudoc[24] = ''
+                xml_rudoc[18] = ''
                 for land_cad_number in land_cad_numbers:
-                    xml_rudoc[24] += land_cad_number['cad_number'] +" ; "
+                    xml_rudoc[18] += land_cad_number['cad_number'] +" ; "
             else:
-                xml_rudoc[24] = land_cad_numbers['cad_number']
+                xml_rudoc[18] = land_cad_numbers['cad_number']
         except:
-            xml_rudoc[24] = ''
+            xml_rudoc[18] = ''
         try:
             land_cad_numbers = xml_dict['extract_base_params_build']['construction_record']['cad_links']['car_parking_space_cad_numbers']['car_parking_space_cad_number']
             if isinstance(land_cad_numbers, list):
                 for land_cad_number in land_cad_numbers:
-                    xml_rudoc[24] += land_cad_number['cad_number'] +" ; "
+                    xml_rudoc[18] += land_cad_number['cad_number'] +" ; "
             else:
-                xml_rudoc[24] = land_cad_numbers['cad_number']
+                xml_rudoc[18] += " ; " + land_cad_numbers['cad_number']
         except:
             ...     # cause - append this column to the previous
 
@@ -190,58 +185,58 @@ def main(*args, **kwargs):
             print(xml_dict['extract_base_params_build']['construction_record']['params']['permitted_uses'])
             land_cad_numbers = xml_dict['extract_base_params_build']['construction_record']['params']['permitted_uses']
             if isinstance(land_cad_numbers, list): # when there are many entries - its a list
-                xml_rudoc[25] = ''
+                xml_rudoc[19] = ''
                 for land_cad_number in land_cad_numbers:
-                    xml_rudoc[25] += land_cad_number['permitted_use']['name'] +" ; "
+                    xml_rudoc[19] += land_cad_number['permitted_use']['name'] +" ; "
             else:                                  # when there is one entry - its not
-                xml_rudoc[25] = land_cad_numbers['permitted_use']['name']
+                xml_rudoc[19] = land_cad_numbers['permitted_use']['name']
         except:
-            xml_rudoc[25] = ''
+            xml_rudoc[19] = ''
 
 
         try:
-            xml_rudoc[26] = xml_dict['extract_base_params_build']['status']
+            xml_rudoc[20] = xml_dict['extract_base_params_build']['status']
         except:
-            xml_rudoc[26] = ''
+            xml_rudoc[20] = ''
         try:
-            xml_rudoc[27] = xml_dict['extract_base_params_build']['construction_record']['special_notes']
+            xml_rudoc[21] = xml_dict['extract_base_params_build']['construction_record']['special_notes']
         except:
-            xml_rudoc[27] = ''
+            xml_rudoc[21] = ''
         try:
             right_records = xml_dict['extract_base_params_build']['right_records']
             if isinstance(right_records, list):
                 for right_record in right_records:
-                    __try_except_set(xml_rudoc, 28, right_record, ['right_record','right_holders'])
+                    __try_except_set(xml_rudoc, 22, right_record, ['right_record','right_holders'])
 
                     # Вид, номер и дата государственной регистрации права
-                    __try_except_set(xml_rudoc, 29, right_record, ['right_record','right_data','right_type'])  #Вид
-                    __try_except_add(xml_rudoc, 29, right_record, ['right_record','right_data','right_number'])  #Номер
-                    __try_except_add(xml_rudoc, 29, right_record, ['right_record','record_info'])  #Дата регистрации
+                    __try_except_set(xml_rudoc, 23, right_record, ['right_record','right_data','right_type'])  #Вид
+                    __try_except_add(xml_rudoc, 23, right_record, ['right_record','right_data','right_number'])  #Номер
+                    __try_except_add(xml_rudoc, 23, right_record, ['right_record','record_info'])  #Дата регистрации
 
-                    __try_except_set(xml_rudoc, 30, right_record, ['right_record','underlying_documents'])  #Документы-основания
-                    __try_except_set(xml_rudoc, 31, right_record, ['right_record','restrict_records'])  #Ограничение прав и обременение объекта недвижимости
-                    __try_except_set(xml_rudoc, 31, xml_rudoc[31], ['restrict_record'])  #Ограничение прав и обременение объекта недвижимости
+                    __try_except_set(xml_rudoc, 24, right_record, ['right_record','underlying_documents'])  #Документы-основания
+                    __try_except_set(xml_rudoc, 25, right_record, ['right_record','restrict_records'])  #Ограничение прав и обременение объекта недвижимости
+                    __try_except_set(xml_rudoc, 25, xml_rudoc[31], ['restrict_record'])  #Ограничение прав и обременение объекта недвижимости
 
-                    __try_except_set(xml_rudoc, 32, right_record, ['right_record','underlying_documents'])  #Сведения о наличии решения об изъятии объекта недвижимости для государственных и муниципальных нужд
-                    __try_except_set(xml_rudoc, 33, right_record, ['right_record','third_party_consents'])  #Сведения об осуществлении государственной регистрации прав без необходимого в силу закона согласия третьего лица, органа
+                    __try_except_set(xml_rudoc, 26, right_record, ['right_record','underlying_documents'])  #Сведения о наличии решения об изъятии объекта недвижимости для государственных и муниципальных нужд
+                    __try_except_set(xml_rudoc, 27, right_record, ['right_record','third_party_consents'])  #Сведения об осуществлении государственной регистрации прав без необходимого в силу закона согласия третьего лица, органа
 
 
-            xml_rudoc[28] = str(dict(right_records))   # to not read many other fields - pass them, as they are in xml
+            # xml_rudoc[28] = str(dict(right_records))   # to not read many other fields - pass them, as they are in xml
         except:
-            xml_rudoc[28] = ''
+            # xml_rudoc[28] = ''
+            pass
 
-        try:
-            rights = xml_dict['extract_base_params_build']['ownerless_right_records']
-            xml_rudoc[29] = str(dict(rights))
-        except:
-            xml_rudoc[29] = ''
+        # try:
+        #     rights = xml_dict['extract_base_params_build']['ownerless_right_records']
+        #     xml_rudoc[29] = str(dict(rights))
+        # except:
+        #     xml_rudoc[29] = ''
 
     return [xml_rudoc[i] for i in range(1, COL_NUM)]
 
 
 def __try_except_set(set_list, key, dict_value, dict_keys):
     try:
-
         for dict_key in dict_keys:
             dict_value = dict_value.__getitem__(dict_key)
         set_list[key] = dict_value
@@ -255,11 +250,12 @@ def __try_except_add(set_list, key, dict_value, dict_keys):
             dict_value = dict_value.__getitem__(dict_key)
         set_list[key] += dict_value
     except:
-        set_list[key] = ''
+        set_list[key] += ''
 
 
 def run(input_dir, output_dir):
-    pass
+    import os.path
+    xml_to_excel(input_dir, os.path.join(output_dir, "Выписки_Здания.xlsx"))
 
 
 if __name__ == '__main__':
