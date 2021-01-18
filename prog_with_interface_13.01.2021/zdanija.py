@@ -215,7 +215,7 @@ def main(*args, **kwargs):
 
                     __try_except_set(xml_rudoc, 24, right_record, ['right_record','underlying_documents'])  #Документы-основания
                     __try_except_set(xml_rudoc, 25, right_record, ['right_record','restrict_records'])  #Ограничение прав и обременение объекта недвижимости
-                    __try_except_set(xml_rudoc, 25, xml_rudoc[31], ['restrict_record'])  #Ограничение прав и обременение объекта недвижимости
+                    __try_except_set(xml_rudoc, 25, xml_rudoc[25], ['restrict_record'])  #Ограничение прав и обременение объекта недвижимости
 
                     __try_except_set(xml_rudoc, 26, right_record, ['right_record','underlying_documents'])  #Сведения о наличии решения об изъятии объекта недвижимости для государственных и муниципальных нужд
                     __try_except_set(xml_rudoc, 27, right_record, ['right_record','third_party_consents'])  #Сведения об осуществлении государственной регистрации прав без необходимого в силу закона согласия третьего лица, органа
