@@ -49,7 +49,8 @@ def xml_to_excel(dir_path, output_xlsx): ##
                 try:
                     print(f"файл № {rcount}")
                     afile = os.path.join(dir_path, file)
-                    df.loc[rcount] = main(afile)
+                    result = main(afile)
+                    df.loc[df.index.max() + 1] = result
                     rcount += 1
                 except:
                     print(f"Ошибка чтения {file} ")
@@ -65,7 +66,8 @@ def main(*args, **kwargs):
     file_path = args[0]
     print(file_path)
 
-    xml_rudoc = {}.fromkeys([i for i in range(1, 27+1)], "")
+    xml_rudoc = {}.fromkeys([i for i in range(1, COL_NUM+1)], "")
+    print(len(xml_rudoc.keys()))
     xml_rudoc[1] = os.path.split(file_path)[-1]
 
     with open(file_path, encoding="utf8") as file:
@@ -136,7 +138,7 @@ def main(*args, **kwargs):
         except:
             xml_rudoc[13] = ''
         try:
-            print(xml_dict['extract_base_params_land']['land_record']['params']['permitted_uses'])
+            # print(xml_dict['extract_base_params_land']['land_record']['params']['permitted_uses'])
             land_cad_numbers = xml_dict['extract_base_params_land']['land_record']['params']['permitted_uses']
             if isinstance(land_cad_numbers, list): # when there are many entries - its a list
                 xml_rudoc[14] = ''
@@ -156,6 +158,7 @@ def main(*args, **kwargs):
             xml_rudoc[16] = ''
         try:
             right_records = xml_dict['extract_base_params_land']['right_records']
+            # TODO print isinstance
             if isinstance(right_records, list):
                 for right_record in right_records:
                     __try_except_set(xml_rudoc, 17, right_record, ['right_record','right_holders'])
@@ -169,11 +172,12 @@ def main(*args, **kwargs):
                     __try_except_set(xml_rudoc, 20, right_record, ['right_record','restrict_records'])  #Ограничение прав и обременение объекта недвижимости
                     __try_except_set(xml_rudoc, 20, xml_rudoc[20], ['restrict_record'])  #Ограничение прав и обременение объекта недвижимости
 
-
             # xml_rudoc[28] = str(dict(right_records))   # to not read many other fields - pass them, as they are in xml
         except:
+            xml_rudoc[20] = ''
+
             # xml_rudoc[28] = ''
-            pass
+
 
         # try:
         #     rights = xml_dict['extract_base_params_land']['ownerless_right_records']
@@ -181,7 +185,7 @@ def main(*args, **kwargs):
         # except:
         #     xml_rudoc[29] = ''
 
-    return [xml_rudoc[i] for i in range(1, COL_NUM)]
+    return [xml_rudoc[i] for i in range(1, COL_NUM+1)]
 
 
 def __try_except_set(set_list, key, dict_value, dict_keys):
@@ -210,6 +214,6 @@ def run(input_dir, output_dir):
 if __name__ == '__main__':
 
     # main(file, "D:\\")
-    inputdir = "D:\\PYTHON\\xml-to-excel\\xml"
-    outputf = "D:\\PYTHON\\xml-to-excel\\Вывод.xlsx"
-    xml_to_excel(inputdir, outputf)
+    inputdir = "C:\\Users\\DesyatovIV\\Desktop\\ЗУ"
+    outputf = "C:\\Users\\DesyatovIV\\Desktop\\ЗУ"
+    run(inputdir, outputf)
