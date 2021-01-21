@@ -43,15 +43,13 @@ def xml_to_excel(dir_path, output_xlsx): ##
 
         df = pandas.DataFrame([[i for i in range(1, COL_NUM+1)],],
                                columns=caps)
-        rcount = 1
         for file in os.listdir(dir_path):
             if ".xml" == os.path.splitext(file)[-1]:
                 try:
-                    print(f"файл № {rcount}")
+                    print(f"файл № {df.index.max() + 1}")
                     afile = os.path.join(dir_path, file)
                     result = main(afile)
                     df.loc[df.index.max() + 1] = result
-                    rcount += 1
                 except:
                     print(f"Ошибка чтения {file} ")
                     print(f"код {sys.exc_info()[0].__dict__}")
