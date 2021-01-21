@@ -116,7 +116,7 @@ def main(*args, **kwargs):
         except:
             xml_rudoc[9] = ''
         try:
-            xml_rudoc[10] = xml_dict['extract_base_params_land']['land_record']['params']['base_parameters']['base_parameter']['area']
+            xml_rudoc[10] = xml_dict['extract_base_params_land']['land_record']['params']['area']['value']
         except:
             xml_rudoc[10] = ''
         try:
@@ -125,27 +125,31 @@ def main(*args, **kwargs):
             xml_rudoc[11] = ''
         try:
             land_cad_numbers = xml_dict['extract_base_params_land']['land_record']['cad_links']['included_objects']['included_object']
-            if isinstance(land_cad_numbers, list):
-                xml_rudoc[12] = ''
-                for land_cad_number in land_cad_numbers:
-                    xml_rudoc[12] += land_cad_number['cad_number'] +" ; "
-            else:
-                xml_rudoc[12] = land_cad_numbers['cad_number']
+            xml_rudoc[12] = __read_obj_or_list(land_cad_numbers, ['cad_number',])
         except:
             xml_rudoc[12] = ''
         try:
             xml_rudoc[13] = xml_dict['extract_base_params_land']['land_record']['params']['category']['type']['value']
         except:
             xml_rudoc[13] = ''
+        # try:
+        #     # print(xml_dict['extract_base_params_land']['land_record']['params']['permitted_uses'])
+        #     land_cad_numbers = xml_dict['extract_base_params_land']['land_record']['params']['permitted_uses']
+        #     if isinstance(land_cad_numbers, list): # when there are many entries - its a list
+        #         xml_rudoc[14] = ''
+        #         for land_cad_number in land_cad_numbers:
+        #             xml_rudoc[14] += land_cad_number['permitted_use']['name'] +" ; "
+        #     else:                                  # when there is one entry - its not
+        #         xml_rudoc[14] = land_cad_numbers['permitted_use']['name']
+        # except:
+        #     xml_rudoc[14] = ''
+
+        # try:
+        #     xml_rudoc[14] += xml_dict['extract_base_params_land']['land_record']['params']['permitted_use']['permitted_use_established']['by_document']
+        # except:
+        #     xml_rudoc[14] = ''
         try:
-            # print(xml_dict['extract_base_params_land']['land_record']['params']['permitted_uses'])
-            land_cad_numbers = xml_dict['extract_base_params_land']['land_record']['params']['permitted_uses']
-            if isinstance(land_cad_numbers, list): # when there are many entries - its a list
-                xml_rudoc[14] = ''
-                for land_cad_number in land_cad_numbers:
-                    xml_rudoc[14] += land_cad_number['permitted_use']['name'] +" ; "
-            else:                                  # when there is one entry - its not
-                xml_rudoc[14] = land_cad_numbers['permitted_use']['name']
+            xml_rudoc[14] = xml_dict['extract_base_params_land']['land_record']['params']['permitted_use']['permitted_use_established']['land_use']['value']
         except:
             xml_rudoc[14] = ''
         try:
@@ -159,25 +163,105 @@ def main(*args, **kwargs):
         try:
             right_records = xml_dict['extract_base_params_land']['right_records']
             # TODO print isinstance
+            def do_records(right_record):
+                __try_except_set(xml_rudoc, 17, right_record, ['right_record', 'right_holders'])
+
+                # Вид, номер и дата государственной регистрации права
+                xml_rudoc[18] = "Вид: "
+                __try_except_add(xml_rudoc, 18, right_record, ['right_record', 'right_data', 'right_type', 'value'])  # Вид
+                xml_rudoc[18] += " ; Номер: "
+                __try_except_add(xml_rudoc, 18, right_record, ['right_record', 'right_data', 'right_number'])  # Номер
+                xml_rudoc[18] += " ; Дата регистрации: "
+                __try_except_add(xml_rudoc, 18, right_record, ['right_record', 'record_info','registration_date'])  # Дата регистрации
+
             if isinstance(right_records, list):
                 for right_record in right_records:
-                    __try_except_set(xml_rudoc, 17, right_record, ['right_record','right_holders'])
-
-                    # Вид, номер и дата государственной регистрации права
-                    __try_except_set(xml_rudoc, 18, right_record, ['right_record','right_data','right_type'])  #Вид
-                    __try_except_add(xml_rudoc, 18, right_record, ['right_record','right_data','right_number'])  #Номер
-                    __try_except_add(xml_rudoc, 18, right_record, ['right_record','record_info'])  #Дата регистрации
-
-                    __try_except_set(xml_rudoc, 19, right_record, ['right_record','underlying_documents'])  #Документы-основания
-                    __try_except_set(xml_rudoc, 20, right_record, ['right_record','restrict_records'])  #Ограничение прав и обременение объекта недвижимости
-                    __try_except_set(xml_rudoc, 20, xml_rudoc[20], ['restrict_record'])  #Ограничение прав и обременение объекта недвижимости
-
-            # xml_rudoc[28] = str(dict(right_records))   # to not read many other fields - pass them, as they are in xml
+                    do_records(right_record)
+            else:
+                do_records(right_records)
         except:
-            xml_rudoc[20] = ''
+            xml_rudoc[18] = ''
+
+        # try:
+        #     right_records = xml_dict['extract_base_params_land']['restrict_records']
+        #
+        #     # TODO print isinstance
+        #     def do_records(right_record):
+        #         __try_except_set(xml_rudoc, 17, right_record, ['right_record', 'right_holders'])
+        #
+        #         # Вид, номер и дата государственной регистрации права
+        #         xml_rudoc[19] = "Дата государственной регистрации: "
+        #         __try_except_add(xml_rudoc, 18, right_record,
+        #                          ['right_record', 'right_data', 'right_type', 'value'])  # Вид
+        #         xml_rudoc[18] += " ; Номер: "
+        #         __try_except_add(xml_rudoc, 18, right_record,
+        #                          ['right_record', 'right_data', 'right_number'])  # Номер
+        #         xml_rudoc[18] += " ; Дата регистрации: "
+        #         __try_except_add(xml_rudoc, 18, right_record,
+        #                          ['right_record', 'record_info', 'registration_date'])  # Дата регистрации
+        #
+        #     if isinstance(right_records, list):
+        #         for right_record in right_records:
+        #             do_records(right_record)
+        #     else:
+        #         do_records(right_records)
+        # except:
+        #     xml_rudoc[18] = ''
+
 
             # xml_rudoc[28] = ''
-
+        try:
+            temp_dict = __try_except_set(None, None, xml_dict, ['extract_base_params_land', 'restrict_records', 'restrict_record'])  # Ограничение прав и обременение объекта недвижимости
+            desc = [
+                'Дата государственной регистрации',
+                'Общие сведения об ограничениях и обременениях',
+                'Сведения о лицах, в пользу которых установлены ограничения права и обременения объекта недвижимости',
+                'Документы-основания',
+                'Сведения об осуществлении государственной регистрации сделки, права, ограничения права, совершенных без необходимого в силу закона согласия третьего лица, органа',
+            ]
+            fields = [
+                ['record_info', 'registration_date'],
+                ['restrictions_encumbrances_data',],
+                ['restrict_parties', 'restricted_rights_parties', 'restricted_rights_party'],
+                ['-',],
+                ['third_party_consents',],
+            ]
+            some = __read_obj_or_list_manytimes(temp_dict, desc, fields)
+            xml_rudoc[20] = some
+            # __try_except_set(xml_rudoc, 20, xml_rudoc[20],
+            #                  ['restrict_record'])  # Ограничение прав и обременение объекта недвижимости
+        except:
+            xml_rudoc[20] = ''
+        try:
+            restrict_records = xml_dict['extract_base_params_land']['restrict_records']
+            def do_restrict_records(restrict_record):
+                temp_dict = {}
+                __try_except_set(temp_dict, 19, restrict_record,
+                                 ['restrict_record', 'underlying_documents'])  # Документы-основания
+                desc = [
+                    'Код документа',
+                    'Наименование',
+                    'Серия документа',
+                    'Номер документа',
+                    'Дата документа',
+                    'Орган власти, организация, выдавшие документ',
+                ]
+                fields = [
+                    ['document_code', ],
+                    ['document_name', ],
+                    ['document_series', ],
+                    ['document_number', ],
+                    ['document_date', ],
+                    ['document_issuer', ],
+                ]
+                xml_rudoc[19] = __read_obj_or_list_manytimes(temp_dict, desc, fields)
+            if isinstance(restrict_records, list):
+                for restrict_record in restrict_records:
+                    do_restrict_records(restrict_record)
+            else:
+                do_restrict_records(right_records)
+        except:
+            xml_rudoc[19] = ''
 
         # try:
         #     rights = xml_dict['extract_base_params_land']['ownerless_right_records']
@@ -192,23 +276,52 @@ def __try_except_set(set_list, key, dict_value, dict_keys):
     try:
         for dict_key in dict_keys:
             dict_value = dict_value.__getitem__(dict_key)
-        set_list[key] = dict_value
+        if set_list:
+            set_list[key] = dict_value
+        return dict_value
     except:
-        set_list[key] = ''
+        if set_list:
+            set_list[key] = ''
+        return ''
 
 
 def __try_except_add(set_list, key, dict_value, dict_keys):
     try:
         for dict_key in dict_keys:
             dict_value = dict_value.__getitem__(dict_key)
-        set_list[key] += dict_value
+        if set_list:
+            set_list[key] += dict_value
+        return dict_value
     except:
-        set_list[key] += ''
+        if set_list:
+            set_list[key] += ''
+        return ''
+
+
+def __read_obj_or_list(obj_or_list, fields:list):
+    if isinstance(obj_or_list, list):
+        _string = ''
+        for obj in obj_or_list:
+            _string += str(__try_except_set(None, None, obj, fields)) + " ; "
+        return
+    else:
+        return __try_except_set(None, None, obj_or_list, fields)
+
+
+def __read_obj_or_list_manytimes(obj_or_list, description:list, fields_obj_or_list):
+    if isinstance(obj_or_list, list):
+        _string = ''
+        for i, obj in enumerate(obj_or_list):
+            _string += description[i] + ": "
+            _string += str(__try_except_set(None, None, obj, fields_obj_or_list[i])) + " ; "
+        return _string
+    else:
+        return __try_except_set(None, None, obj_or_list, fields_obj_or_list)
 
 
 def run(input_dir, output_dir):
     import os.path
-    xml_to_excel(input_dir, os.path.join(output_dir, "Выписки_Здания.xlsx"))
+    xml_to_excel(input_dir, os.path.join(output_dir, "Выписки_ЗУ.xlsx"))
 
 
 if __name__ == '__main__':
