@@ -30,7 +30,8 @@ def __try_append(set_list, index, nested_dict, dict_keys=[]):
     try:
         for dict_key in dict_keys:
             nested_dict = nested_dict.__getitem__(dict_key)
-        set_list[index] += str(nested_dict)
+        if set_list:
+            set_list[index] += str(nested_dict)
         return str(nested_dict)
     except:
         return ''
@@ -51,9 +52,10 @@ def __try_date(set_list, index, nested_dict, dict_keys=[], try_func=__try_set):
     """
     import datetime
     try:
-        dt = try_func(set_list, index, nested_dict, dict_keys) # 2012-07-05T00:00:00+04:00
+        dt = try_func(None, None, nested_dict, dict_keys) # 2012-07-05T00:00:00+04:00
         dt = datetime.datetime.strptime(dt, "%Y-%m-%dT%H:%M:%S%z")
         try_func(set_list, index, str(dt.date()))
+        print(str(dt.date())+" sdfsdfsdf")
         return str(dt.date())  # Дата присвоения кадастрового номера
     except:
         return ''

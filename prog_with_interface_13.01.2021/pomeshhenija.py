@@ -107,7 +107,7 @@ def main(*args, **kwargs):
 
         tm.__try_set(xml_rudoc, 9, xml_dict, ['extract_base_params_room', 'room_record', 'address_room', 'address', 'address', 'readable_address'])
         tm.__try_set(xml_rudoc, 10, xml_dict, ['extract_base_params_room', 'room_record', 'params', 'area'])
-        tm.__try_set(xml_rudoc, 11, xml_dict, ['extract_base_params_room', 'room_record', 'params', 'purpose'])
+        tm.__try_set(xml_rudoc, 11, xml_dict, ['extract_base_params_room', 'room_record', 'params', 'purpose', 'value'])
         tm.__try_set(xml_rudoc, 12, xml_dict, ['extract_base_params_room', 'room_record', 'params', 'name'])
         tm.__try_set(xml_rudoc, 13, xml_dict, ['extract_base_params_room', 'room_record', 'location_in_build', 'level', 'floor'])
         tm.__try_set(xml_rudoc, 14, xml_dict, ['extract_base_params_room', 'room_record', 'params', 'type', 'value'])
@@ -141,15 +141,20 @@ def main(*args, **kwargs):
         tm.__try_set(xml_rudoc, 20, xml_dict, ['extract_base_params_room', 'room_record', 'special_notes'])
 
         try:
-            right_records = xml_dict['extract_base_params_room']['right_records']['right_record','restrict_records']
+            right_records = xml_dict['extract_base_params_room']['right_records']
 
             def do_records(right_record):
                 tm.__try_set(xml_rudoc, 21, right_record, ['right_record', 'right_holders'])
 
                 # Вид, номер и дата государственной регистрации права
-                tm.__try_set(xml_rudoc, 22, right_record, ['right_record', 'right_data', 'right_type'])  #Вид
-                tm.__try_append(xml_rudoc, 22, right_record, ['right_record', 'right_data', 'right_number'])  #Номер
-                tm.__try_append(xml_rudoc, 22, right_record, ['right_record', 'record_info'])  #Дата регистрации
+                xml_rudoc[22] = "Вид: "
+                tm.__try_append(xml_rudoc, 22, right_record,
+                                 ['right_record', 'right_data', 'right_type', 'value'])  # Вид
+                xml_rudoc[22] += " ; Номер: "
+                tm.__try_append(xml_rudoc, 22, right_record, ['right_record', 'right_data', 'right_number'])  # Номер
+                xml_rudoc[22] += " ; Дата регистрации: "
+                tm.__try_date(xml_rudoc, 22, right_record,
+                                 ['right_record', 'record_info', 'registration_date'], try_func=tm.__try_append)  # Дата регистрации
 
                 tm.__try_set(xml_rudoc, 23, right_record, ['right_record', 'underlying_documents'])  #Документы-основания
                 tm.__try_set(xml_rudoc, 24, xml_dict,
@@ -182,12 +187,12 @@ def main(*args, **kwargs):
 
 def run(input_dir, output_dir):
     import os.path
-    xml_to_excel(input_dir, os.path.join(output_dir, "Выписки_Здания.xlsx"))
+    xml_to_excel(input_dir, os.path.join(output_dir, "Выписки_Помещения.xlsx"))
 
 
 if __name__ == '__main__':
 
     # main(file, "D:\\")
     inputdir = "C:\\Users\\DesyatovIV\\Desktop\\pomeshhenija"
-    outputf = "C:\\Users\\DesyatovIV\\Desktop\\pomeshhenija\\Вывод_Помещение.xlsx"
+    outputf = "C:\\Users\\DesyatovIV\\Desktop\\pomeshhenija\\Вывод_Помещения.xlsx"
     xml_to_excel(inputdir, outputf)
