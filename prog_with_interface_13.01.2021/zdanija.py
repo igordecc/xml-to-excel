@@ -54,10 +54,10 @@ def xml_to_excel(dir_path, output_xlsx): ##
         for file in os.listdir(dir_path):
             if ".xml" == os.path.splitext(file)[-1]:
                 try:
-                    print(f"файл № {rcount}")
+                    print(f"файл № {df.index.max() + 1}")
                     afile = os.path.join(dir_path, file)
-                    df.loc[rcount] = main(afile)
-                    rcount += 1
+                    result = main(afile)
+                    df.loc[df.index.max() + 1] = result
                 except:
                     print(f"Ошибка чтения {file} ")
                     print(f"код {sys.exc_info()[0].__dict__}")
@@ -232,7 +232,7 @@ def main(*args, **kwargs):
         # except:
         #     xml_rudoc[29] = ''
 
-    return [xml_rudoc[i] for i in range(1, COL_NUM)]
+    return [xml_rudoc[i] for i in range(1, COL_NUM+1)]
 
 
 def __try_except_set(set_list, key, dict_value, dict_keys):
