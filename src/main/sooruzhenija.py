@@ -13,6 +13,7 @@ import datetime
 from collections.abc import Iterable
 from collections import OrderedDict
 import os.path
+import pytest
 
 def xml_to_excel(dir_path, output_xlsx):
     if os.path.isdir(dir_path):
@@ -66,6 +67,7 @@ def xml_to_excel(dir_path, output_xlsx):
         writer.save()
 
         print("Выполнено")
+        return df.index.max() + 1
 
 
 def main(*args, **kwargs):
@@ -286,9 +288,19 @@ def run(input_dir, output_dir):
     print(os.path.join(output_dir, "Выписки_Сооружения.xlsx"))
 
 
-if __name__ == '__main__':
-
-    # main(file, "D:\\")
+def test_run():
     inputdir = "D:\\PYTHON\\xml-to-excel\\xml_сооружения_29.12.2020"
     outputf = "D:\\PYTHON\\xml-to-excel\\Выписки_Сооружения.xlsx"
-    xml_to_excel(inputdir, outputf)
+
+    got_items = xml_to_excel(inputdir, outputf)
+    gave_items = len(os.listdir(inputdir))
+
+    assert gave_items == got_items
+
+if __name__ == '__main__':
+    test_run()
+    pass
+    # main(file, "D:\\")
+
+
+

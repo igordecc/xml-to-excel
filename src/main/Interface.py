@@ -1,11 +1,12 @@
+"""
+13.01.2021
+Xml converter program with interface.
+"""
+
 import sys
-import os
 import main_run
-from PyQt5.QtWidgets import (QWidget, QLCDNumber, QSlider,
-                             QVBoxLayout, QApplication, QPushButton, QFileDialog, QAction, QComboBox)
-from PyQt5.QtCore import QUrl
+from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QApplication, QPushButton, QAction, QComboBox)
 from PyQt5 import QtWidgets
-from PyQt5 import QtCore
 
 from PyQt5.QtGui import QIcon
 
@@ -72,7 +73,7 @@ class UI(QWidget):
         self.setLayout(self.vbox)
         self.setFixedSize(280, 180)
 
-        self.setWindowTitle('Добавить надпись')
+        self.setWindowTitle('Конвертер выписок')
         self.show()
 
 # --- dialogs
