@@ -15,7 +15,7 @@ from collections import OrderedDict
 import os.path
 import pytest
 
-def xml_to_excel(dir_path, output_xlsx):
+def xml_to_excel(dir_path, output_xlsx, verbose=False):
     if os.path.isdir(dir_path):
         caps = ['Наименование файла',
                 'Номер выписки',
@@ -55,16 +55,20 @@ def xml_to_excel(dir_path, output_xlsx):
         for file in os.listdir(dir_path):
             if ".xml" == os.path.splitext(file)[-1]:
                 try:
-                    print(f"файл № {df.index.max() + 1}")
                     afile = os.path.join(dir_path, file)
                     result = main(afile)
                     df.loc[df.index.max() + 1] = result
+                    if verbose:
+                        print(f"файл № {df.index.max() + 1}")
+                        print(afile)
                 except:
-                    print(f"Ошибка чтения {file} ")
-                    print(f"код {sys.exc_info()[0].__dict__}")
+                    if verbose:
+                        print(f"Ошибка чтения {file} ")
+                        print(f"код {sys.exc_info()[0].__dict__}")
         writer = pandas.ExcelWriter(output_xlsx)
         df.to_excel(writer, index=False)
         writer.save()
+
 
         print("Выполнено")
         return df.index.max() + 1
@@ -113,7 +117,6 @@ def main(*args, **kwargs):
     :return:
     """
     file_path = args[0]
-    print(file_path)
 
     xml_rudoc = {}.fromkeys([i for i in range(1, 32+1)], "")
     xml_rudoc[1] = os.path.split(file_path)[-1]
@@ -289,8 +292,8 @@ def run(input_dir, output_dir):
 
 
 def test_run():
-    inputdir = "D:\\PYTHON\\xml-to-excel\\xml_сооружения_29.12.2020"
-    outputf = "D:\\PYTHON\\xml-to-excel\\Выписки_Сооружения.xlsx"
+    inputdir = "D:\\PYTHON\\xml-to-excel\\src\\main\\resources\\сооружения\\xml_сооружения_29.12.2020"
+    outputf = "D:\\Выписки_Сооружения.xlsx"
 
     got_items = xml_to_excel(inputdir, outputf)
     gave_items = len(os.listdir(inputdir))
