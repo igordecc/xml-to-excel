@@ -4,6 +4,10 @@ contain function to transfer specific info from xml to excel
 - for directory with files - do_all()
 """
 
+# TODO research adding data to dataframe instead of the dict
+# TODO how to check if all columns are right quicly - write Unit tests!!!
+
+
 import os, sys
 import pandas
 import xml.etree.ElementTree as ET
@@ -14,6 +18,8 @@ from collections.abc import Iterable
 from collections import OrderedDict
 import os.path
 import pytest
+import try_modules as tm
+
 
 def xml_to_excel(dir_path, output_xlsx, verbose=False):
     if os.path.isdir(dir_path):
@@ -68,10 +74,9 @@ def xml_to_excel(dir_path, output_xlsx, verbose=False):
         writer = pandas.ExcelWriter(output_xlsx)
         df.to_excel(writer, index=False)
         writer.save()
-
-
-        print("Выполнено")
-        return df.index.max() + 1
+        if verbose:
+            print("Выполнено")
+        return df.index.max()
 
 
 def main(*args, **kwargs):
@@ -124,10 +129,12 @@ def main(*args, **kwargs):
 
     with open(file_path, encoding="utf8") as file:
         xml_dict = xmltodict.parse(file.read())
-        try:
-            xml_rudoc[2] = xml_dict['extract_base_params_construction']['details_statement']['group_top_requisites']['registration_number']
-        except:
-            xml_rudoc[2] = ''
+
+        tm.__try_set(xml_rudoc, 2, xml_dict, ['extract_base_params_construction', 'details_statement', 'group_top_requisites', 'registration_number'])
+        # try:
+        #     xml_rudoc[2] = xml_dict['extract_base_params_construction']['details_statement']['group_top_requisites']['registration_number']
+        # except:
+        #     xml_rudoc[2] = ''
         try:
             xml_rudoc[3] = xml_dict['extract_base_params_construction']['details_statement']['group_top_requisites']['date_formation']
         except:
@@ -286,9 +293,13 @@ def main(*args, **kwargs):
     return [xml_rudoc[i] for i in range(1, COL_NUM+1)]
 
 
-def run(input_dir, output_dir):
-    xml_to_excel(input_dir, os.path.join(output_dir, "Выписки_Сооружения.xlsx"))
-    print(os.path.join(output_dir, "Выписки_Сооружения.xlsx"))
+
+
+def run(input_dir, output_dir, verbose=False):
+    if verbose:
+        print(os.path.join(output_dir, "Выписки_Сооружения.xlsx"))
+    return xml_to_excel(input_dir, os.path.join(output_dir, "Выписки_Сооружения.xlsx"), verbose=verbose)
+
 
 
 def test_run():
