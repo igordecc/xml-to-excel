@@ -61,7 +61,8 @@ def __try_date(set_list, index, nested_dict, dict_keys=[], try_func=__try_set):
         return ''
 
 
-def __try_change(set_list, index, nested_dict, dict_keys=[], try_func=__try_set, if_condition=lambda value: value == "", change_value_to=""):
+def __try_change(set_list, index, nested_dict, dict_keys=[], try_func=__try_set, if_condition=lambda value: value == "",
+                 change_value_to=""):
     """
     Use @try_func, then @change_value_to given according to @if_condition function return true.
 
@@ -84,7 +85,8 @@ def __try_change(set_list, index, nested_dict, dict_keys=[], try_func=__try_set,
 
 
 #TODO remake this into simpler for function
-def __try_isinstance(set_list, index, nested_dict, dict_keys=[], try_func=__try_set, _class=list, do_func=lambda *args, **kwargs:"", *args, **kwargs):
+def __try_isinstance(set_list, index, nested_dict, dict_keys=[], try_func=__try_set, _class=list, do_func=lambda *args,
+                     **kwargs: "", *args, **kwargs):
     # do additional function if instance
     try:
         instance_or_not = try_func(set_list, index, nested_dict, dict_keys)
