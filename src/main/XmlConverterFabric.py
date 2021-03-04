@@ -3,65 +3,99 @@ import xmltodict
 import pandas
 import datetime
 
+"""
+xml -> excel
+Main idea is to set all fields, that need to be read
+and the way we will read them fields, before-hand;
+then execute most common fields
+then word directly with complicated one
+then return result
+"""
+
 
 class XmlConverterFabric:
     def __init__(self, *args, **kwargs):
-        self.xml_dir = None
-        self.excel_dir = None
-        self._2d_array = None   # [["parent_node", "child_node", "child_child_node"]]
-        self.caps = None    # ["Чтение из файла", "Вывод"]
+        self.config = {
+            "xml": None,
+            "excel": None,
+            "excel_filename": None,
+            "_2d_array": None,  # [["parent_node", "child_node", "child_child_node"]]
+            "caps": None,   # ["Чтение из файла", "Вывод"]
+        }
+
+    # set input and output path
+
+    def set_config(self, config):
+        self.config = config
+        self.check_config(self)
+        self.check_xml_dir(self)
+        self.check_excel_dir(self)
+        self.check_excel_filename(self)
+        self.check_fields(self)
+        self.check_caps(self)
 
 
-    def set_xml_dir(self, xml: str):
-        if os.path.exists(xml):
-            self.xml_dir = xml
-        else:
+    @staticmethod
+    def check_xml_dir(self):
+        if not os.path.exists(self.config["xml"]):
             raise Exception("Xml Path does not exists")
 
-    def set_excel_dir(self, excel: str):
-        if os.path.exists(excel):
-            if os.path.isdir(excel):
-                self.excel_dir = os.path.join(excel, "Converted.xlsx")
-            elif os.path.isfile(excel):
-                self.excel_dir = excel
-            else:
-                raise Exception("Bad excel dir name")
-        else:
-            raise Exception("Excel Path does not exists")
+    @staticmethod
+    def check_excel_dir(self):
+        if not os.path.isdir(self.config["excel"]):
+            raise Exception("Bad excel dir name")
 
-    def set_excel_filename(self, filename: str):
-        self.excel_dir = os.path.join(os.path.dirname(self.excel_dir), filename)
+    @staticmethod
+    def check_excel_filename(self):
+        if not os.path.splitext(self.config["excel_filename"])[1] == ".xlsx":
+            raise Exception("Wrong excel file extension")
 
-    def set_fields(self, _2d_array: list):
-        self._2d_array = _2d_array
+    @staticmethod
+    def check_fields(self):
+        if not self.config["fields"]:
+            raise Exception("Set fields")
+        if not isinstance(self.config["fields"], list):
+            raise Exception("Bad Fields")
 
-    def set_caps(self, caps: list):
-        self.caps = caps
+    @staticmethod
+    def check_caps(self):
+        if not self.config["caps"]:
+            raise Exception("Set caps")
+        if not isinstance(self.config["fields"], list):
+            raise Exception("Bad Fields")
+
+    @staticmethod
+    def check_config(self):
+        empty_fields = [i[0] for i in self.config.items() if i[1] is None]
+        if empty_fields:
+            print("Error! There is an empty config fields :")
+            for field in empty_fields:
+                print(f"    {field}")
+            raise Exception
 
     def run(self):
+        self.check_config(self)
+        if os.path.exists(self.config["xml"]) and os.path.isdir(os.path.dirname(self.config["excel"])):
+            self.convert(self, self.config["xml"], os.path.join(self.config["excel"], self.config["excel_filename"]))
 
-        if os.path.exists(self.xml_dir) and os.path.isdir(os.path.dirname(self.excel_dir)):
-            self.convert(self.xml_dir, self.excel_dir)
-            empty_fields = [i[0] for i in self.__dict__.items() if i[1] is None]
-            if empty_fields:
-                print("Error! There is an empty config fields :")
-                for field in empty_fields:
-                    print(f"    {field}")
-                raise Exception
             print("Running the converter...")
         else:
             raise Exception("Bad xml dir or excel dir")
 
     @staticmethod
-    def convert(*args, **kwargs):
+    def convert(self, *args, **kwargs):
         print("converted")
 
 
 if __name__ == '__main__':
     fabric = XmlConverterFabric()
-    fabric.set_xml_dir("D:\\PYTHON\\xml-to-excel\\src\\main\\resources\\здания\\xml_здания_Выписки_ч3")
-    fabric.set_excel_dir("D:\\PYTHON\\xml-to-excel\\Вывод.xlsx")
-    fabric.set_excel_filename("Converted.xlsx")
-    fabric.set_caps([])
-    fabric.set_fields([])
+    config = {
+        "xml": "D:\\PYTHON\\xml-to-excel\\src\\main\\resources\\здания\\xml_здания_Выписки_ч3",
+        "excel": "D:\\PYTHON\\xml-to-excel\\",
+        "excel_filename": "Converted.xlsx",
+        "caps": ["123"],
+        "fields": ["123"],
+    }
+    fabric.set_config(config)
     fabric.run()
+    print("Test ok")

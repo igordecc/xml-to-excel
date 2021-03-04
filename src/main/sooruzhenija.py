@@ -130,7 +130,7 @@ def main(*args, **kwargs):
     with open(file_path, encoding="utf8") as file:
         xml_dict = xmltodict.parse(file.read())
 
-        tm.__try_set(xml_rudoc, 2, xml_dict, ['extract_base_params_construction', 'details_statement', 'group_top_requisites', 'registration_number'])
+        tm._try_set(xml_rudoc, 2, xml_dict, ['extract_base_params_construction', 'details_statement', 'group_top_requisites', 'registration_number'])
         # try:
         #     xml_rudoc[2] = xml_dict['extract_base_params_construction']['details_statement']['group_top_requisites']['registration_number']
         # except:

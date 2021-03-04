@@ -77,17 +77,17 @@ def main(*args, **kwargs):
     with open(file_path, encoding="utf8") as file:
         xml_dict = xmltodict.parse(file.read())
 
-        tm.__try_set(xml_rudoc, 2, xml_dict, ['extract_base_params_room', 'details_statement', 'group_top_requisites', 'registration_number'])
-        tm.__try_set(xml_rudoc, 3, xml_dict, ['extract_base_params_room', 'details_statement', 'group_top_requisites', 'date_formation'])
+        tm._try_set(xml_rudoc, 2, xml_dict, ['extract_base_params_room', 'details_statement', 'group_top_requisites', 'registration_number'])
+        tm._try_set(xml_rudoc, 3, xml_dict, ['extract_base_params_room', 'details_statement', 'group_top_requisites', 'date_formation'])
 
-        tm.__try_change(xml_rudoc, 4, xml_dict, ['extract_base_params_room', 'room_record', 'object', 'common_data', 'type', 'value'],
-                        if_condition=lambda value: value == "room_record",
-                        change_value_to="Сооружение",
-                        )
+        tm._try_change(xml_rudoc, 4, xml_dict, ['extract_base_params_room', 'room_record', 'object', 'common_data', 'type', 'value'],
+                       if_condition=lambda value: value == "room_record",
+                       change_value_to="Сооружение",
+                       )
 
-        tm.__try_date(xml_rudoc, 5, xml_dict, ['extract_base_params_room', 'room_record', 'record_info', 'registration_date'])
-        tm.__try_set(xml_rudoc, 6, xml_dict, ['extract_base_params_room', 'room_record', 'object', 'common_data', 'cad_number'])
-        tm.__try_set(xml_rudoc, 7, xml_dict, ['extract_base_params_room', 'room_record', 'object', 'common_data', 'quarter_cad_number'])
+        tm._try_date(xml_rudoc, 5, xml_dict, ['extract_base_params_room', 'room_record', 'record_info', 'registration_date'])
+        tm._try_set(xml_rudoc, 6, xml_dict, ['extract_base_params_room', 'room_record', 'object', 'common_data', 'cad_number'])
+        tm._try_set(xml_rudoc, 7, xml_dict, ['extract_base_params_room', 'room_record', 'object', 'common_data', 'quarter_cad_number'])
 
         try:
             old_numbers = xml_dict['extract_base_params_room']['room_record']['cad_links']['old_numbers']["old_number"]
@@ -105,13 +105,13 @@ def main(*args, **kwargs):
         #                     ['extract_base_params_room', 'room_record', 'cad_links', 'old_numbers', "old_number"], _class=list, do_func=do_func_8
         #                     )
 
-        tm.__try_set(xml_rudoc, 9, xml_dict, ['extract_base_params_room', 'room_record', 'address_room', 'address', 'address', 'readable_address'])
-        tm.__try_set(xml_rudoc, 10, xml_dict, ['extract_base_params_room', 'room_record', 'params', 'area'])
-        tm.__try_set(xml_rudoc, 11, xml_dict, ['extract_base_params_room', 'room_record', 'params', 'purpose', 'value'])
-        tm.__try_set(xml_rudoc, 12, xml_dict, ['extract_base_params_room', 'room_record', 'params', 'name'])
-        tm.__try_set(xml_rudoc, 13, xml_dict, ['extract_base_params_room', 'room_record', 'location_in_build', 'level', 'floor'])
-        tm.__try_set(xml_rudoc, 14, xml_dict, ['extract_base_params_room', 'room_record', 'params', 'type', 'value'])
-        tm.__try_set(xml_rudoc, 15, xml_dict, ['extract_base_params_room', 'room_record', 'cost', 'value'])
+        tm._try_set(xml_rudoc, 9, xml_dict, ['extract_base_params_room', 'room_record', 'address_room', 'address', 'address', 'readable_address'])
+        tm._try_set(xml_rudoc, 10, xml_dict, ['extract_base_params_room', 'room_record', 'params', 'area'])
+        tm._try_set(xml_rudoc, 11, xml_dict, ['extract_base_params_room', 'room_record', 'params', 'purpose', 'value'])
+        tm._try_set(xml_rudoc, 12, xml_dict, ['extract_base_params_room', 'room_record', 'params', 'name'])
+        tm._try_set(xml_rudoc, 13, xml_dict, ['extract_base_params_room', 'room_record', 'location_in_build', 'level', 'floor'])
+        tm._try_set(xml_rudoc, 14, xml_dict, ['extract_base_params_room', 'room_record', 'params', 'type', 'value'])
+        tm._try_set(xml_rudoc, 15, xml_dict, ['extract_base_params_room', 'room_record', 'cost', 'value'])
 
         try:
             land_cad_numbers = xml_dict['extract_base_params_room']['room_record']['cad_links']['land_cad_numbers']['land_cad_number']
@@ -136,33 +136,33 @@ def main(*args, **kwargs):
         except:
             xml_rudoc[17] = ''
 
-        tm.__try_set(xml_rudoc, 18, xml_dict, ['extract_base_params_room', 'room_record', 'params', 'special_type', 'value'])
-        tm.__try_set(xml_rudoc, 19, xml_dict, ['extract_base_params_room', 'status'])
-        tm.__try_set(xml_rudoc, 20, xml_dict, ['extract_base_params_room', 'room_record', 'special_notes'])
+        tm._try_set(xml_rudoc, 18, xml_dict, ['extract_base_params_room', 'room_record', 'params', 'special_type', 'value'])
+        tm._try_set(xml_rudoc, 19, xml_dict, ['extract_base_params_room', 'status'])
+        tm._try_set(xml_rudoc, 20, xml_dict, ['extract_base_params_room', 'room_record', 'special_notes'])
 
         try:
             right_records = xml_dict['extract_base_params_room']['right_records']
 
             def do_records(right_record):
-                tm.__try_set(xml_rudoc, 21, right_record, ['right_record', 'right_holders'])
+                tm._try_set(xml_rudoc, 21, right_record, ['right_record', 'right_holders'])
 
                 # Вид, номер и дата государственной регистрации права
                 xml_rudoc[22] = "Вид: "
-                tm.__try_append(xml_rudoc, 22, right_record,
-                                 ['right_record', 'right_data', 'right_type', 'value'])  # Вид
+                tm._try_append(xml_rudoc, 22, right_record,
+                               ['right_record', 'right_data', 'right_type', 'value'])  # Вид
                 xml_rudoc[22] += " ; Номер: "
-                tm.__try_append(xml_rudoc, 22, right_record, ['right_record', 'right_data', 'right_number'])  # Номер
+                tm._try_append(xml_rudoc, 22, right_record, ['right_record', 'right_data', 'right_number'])  # Номер
                 xml_rudoc[22] += " ; Дата регистрации: "
-                tm.__try_date(xml_rudoc, 22, right_record,
-                                 ['right_record', 'record_info', 'registration_date'], try_func=tm.__try_append)  # Дата регистрации
+                tm._try_date(xml_rudoc, 22, right_record,
+                             ['right_record', 'record_info', 'registration_date'], try_func=tm._try_append)  # Дата регистрации
 
-                tm.__try_set(xml_rudoc, 23, right_record, ['right_record', 'underlying_documents'])  #Документы-основания
-                tm.__try_set(xml_rudoc, 24, xml_dict,
-                             ['extract_base_params_room', 'right_records', 'right_record', 'restrict_record'])  # Ограничение прав и обременение объекта недвижимости
-                tm.__try_set(xml_rudoc, 24, xml_dict, ['extract_base_params_room', 'right_records', 'right_record', 'restrict_records', 'restrict_record'])  # Ограничение прав и обременение объекта недвижимости
+                tm._try_set(xml_rudoc, 23, right_record, ['right_record', 'underlying_documents'])  #Документы-основания
+                tm._try_set(xml_rudoc, 24, xml_dict,
+                            ['extract_base_params_room', 'right_records', 'right_record', 'restrict_record'])  # Ограничение прав и обременение объекта недвижимости
+                tm._try_set(xml_rudoc, 24, xml_dict, ['extract_base_params_room', 'right_records', 'right_record', 'restrict_records', 'restrict_record'])  # Ограничение прав и обременение объекта недвижимости
 
-                tm.__try_set(xml_rudoc, 25, right_record, ['right_record', 'underlying_documents'])  #Сведения о наличии решения об изъятии объекта недвижимости для государственных и муниципальных нужд
-                tm.__try_set(xml_rudoc, 26, right_record, ['right_record', 'third_party_consents'])  #Сведения об осуществлении государственной регистрации прав без необходимого в силу закона согласия третьего лица, органа
+                tm._try_set(xml_rudoc, 25, right_record, ['right_record', 'underlying_documents'])  #Сведения о наличии решения об изъятии объекта недвижимости для государственных и муниципальных нужд
+                tm._try_set(xml_rudoc, 26, right_record, ['right_record', 'third_party_consents'])  #Сведения об осуществлении государственной регистрации прав без необходимого в силу закона согласия третьего лица, органа
 
             if isinstance(right_records, list):
                 for right_record in right_records:
