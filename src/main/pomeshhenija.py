@@ -80,10 +80,10 @@ def main(*args, **kwargs):
         tm._try_set(xml_rudoc, 2, xml_dict, ['extract_base_params_room', 'details_statement', 'group_top_requisites', 'registration_number'])
         tm._try_set(xml_rudoc, 3, xml_dict, ['extract_base_params_room', 'details_statement', 'group_top_requisites', 'date_formation'])
 
-        tm._try_change(xml_rudoc, 4, xml_dict, ['extract_base_params_room', 'room_record', 'object', 'common_data', 'type', 'value'],
-                       if_condition=lambda value: value == "room_record",
-                       change_value_to="Сооружение",
-                       )
+        tm._try_change_value_if(xml_rudoc, 4, xml_dict, ['extract_base_params_room', 'room_record', 'object', 'common_data', 'type', 'value'],
+                                if_condition=lambda value: value == "room_record",
+                                change_value_to="Сооружение",
+                                )
 
         tm._try_date(xml_rudoc, 5, xml_dict, ['extract_base_params_room', 'room_record', 'record_info', 'registration_date'])
         tm._try_set(xml_rudoc, 6, xml_dict, ['extract_base_params_room', 'room_record', 'object', 'common_data', 'cad_number'])

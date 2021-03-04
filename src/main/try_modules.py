@@ -12,14 +12,22 @@ def _try_set(set_list, index, nested_dict, dict_keys=[]):
         for dict_key in dict_keys:
             nested_dict = nested_dict.__getitem__(dict_key)
         set_list[index] = str(nested_dict)
-        return str(nested_dict)
+        return nested_dict
     except:
         return ''
 
 
+def _try(_dict, _fields):
+    try:
+        return _dict[_fields]
+    except:
+        return None
+
+
 def _try_append(set_list, index, nested_dict, dict_keys=[]):
     """
-    Appends selected single node from nested dict to the list at the index. Append instead of rewriting as in case of __try_set.
+    Appends selected single node from nested dict to the list at the index.
+    Append instead of rewriting as in case of __try_set.
 
     :param set_list: will convert to excel
     :param index: column's index
@@ -32,7 +40,7 @@ def _try_append(set_list, index, nested_dict, dict_keys=[]):
             nested_dict = nested_dict.__getitem__(dict_key)
         if set_list:
             set_list[index] += str(nested_dict)
-        return str(nested_dict)
+        return nested_dict
     except:
         return ''
 
@@ -56,13 +64,13 @@ def _try_date(set_list, index, nested_dict, dict_keys=[], try_func=_try_set):
         dt = datetime.datetime.strptime(dt, "%Y-%m-%dT%H:%M:%S%z")
         try_func(set_list, index, str(dt.date()))
         print(str(dt.date())+" sdfsdfsdf")
-        return str(dt.date())  # Дата присвоения кадастрового номера
+        return dt.date()  # Дата присвоения кадастрового номера
     except:
         return ''
 
 
-def _try_change(set_list, index, nested_dict, dict_keys=[], try_func=_try_set, if_condition=lambda value: value == "",
-                change_value_to=""):
+def _try_change_value_if(set_list, index, nested_dict, dict_keys=[], try_func=_try_set, if_condition=lambda value: value == "",
+                         change_value_to=""):
     """
     Use @try_func, then @change_value_to given according to @if_condition function return true.
 
@@ -85,18 +93,36 @@ def _try_change(set_list, index, nested_dict, dict_keys=[], try_func=_try_set, i
 
 
 #TODO remake this into simpler for function
-def _try_isinstance(set_list, index, nested_dict, dict_keys=[], try_func=_try_set, _class=list, do_func=lambda *args,
-                                                                                                               **kwargs: "", *args, **kwargs):
+def _try_isinstance_of_list(set_list,
+                    index,
+                    nested_dict,
+                    dict_keys=[],
+                    try_func=_try_set,
+                    do_func=lambda *args, **kwargs: "",
+                    do_func_is_not=lambda *args, **kwargs: "",
+                    *args,
+                    **kwargs
+                    ):
     # do additional function if instance
     try:
         instance_or_not = try_func(set_list, index, nested_dict, dict_keys)
-        if isinstance(instance_or_not, _class):
-            set_list[index] = ''
-            return do_func(*args, **kwargs)
+        if isinstance(instance_or_not, list):
+            for element in instance_or_not:
+                return do_func(element, *args, **kwargs)
         else:
-            set_list[index] = instance_or_not
-            return instance_or_not
+            return do_func_is_not(instance_or_not, *args, **kwargs)
     except:
         return ''
+
+
+
+
+def execute_for_one_or_many(parsed_xml_element, method):
+    if isinstance(parsed_xml_element, list):
+        for right_record in parsed_xml_element:
+            method(right_record)
+    else:
+        method(parsed_xml_element)
+
 
 
