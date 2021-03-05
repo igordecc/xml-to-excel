@@ -8,10 +8,60 @@ import traceback
 import datetime
 
 
-class Excel_row:
-    def __init__(self, _len, script_list: list):
+class Row:
+    def __init__(self, name, _len):
+        self.filename = name
         self.row = ["" for i in _len]
-        self.script_list = script_list
+        self.script_list = []
+        try:
+            with open(self.filename, encoding="utf8") as opened_file:
+                self.xml_dict = xmltodict.parse(opened_file.read())
+
+        except:
+            print("Xml file read error: ")
+            print(sys.exc_info())
+
+        self.xml_value_table = []
+
+    def fill_xml__value_table(self):
+
+
+
+        # CAPS_ANALOG = [2, 3,   5, 6, 7,   9, 10, 11, 12, 13, 14, 15,   18, 19, 20]
+        simple_xml_values = [
+            ['extract_base_params_room', 'details_statement', 'group_top_requisites', 'registration_number'],
+            ['extract_base_params_room', 'details_statement', 'group_top_requisites', 'date_formation'],
+
+            ['extract_base_params_room', 'room_record', 'record_info', 'registration_date'],
+            ['extract_base_params_room', 'room_record', 'object', 'common_data', 'cad_number'],
+            ['extract_base_params_room', 'room_record', 'object', 'common_data', 'quarter_cad_number'],
+
+            ['extract_base_params_room', 'room_record', 'address_room', 'address', 'address', 'readable_address'],
+            ['extract_base_params_room', 'room_record', 'params', 'area'],
+            ['extract_base_params_room', 'room_record', 'params', 'purpose', 'value'],
+            ['extract_base_params_room', 'room_record', 'params', 'name'],
+            ['extract_base_params_room', 'room_record', 'location_in_build', 'level', 'floor'],
+            ['extract_base_params_room', 'room_record', 'params', 'type', 'value'],
+            ['extract_base_params_room', 'room_record', 'cost', 'value'],
+
+            ['extract_base_params_room', 'room_record', 'params', 'special_type', 'value'],
+            ['extract_base_params_room', 'status'],
+            ['extract_base_params_room', 'room_record', 'special_notes'],
+        ]
+
+        for column in simple_xml_values:
+            field_sequence = config["fields"][column]
+            tm._try_set(excel_row_with_numerated_columns, column, xml_dict,
+                        dict_keys=field_sequence
+                        )
+
+        self.xml_value_table.append()
+
+
+
+    # there will be TWO type of scripts - xml_values and excel_column scripts!
+    # def set_script(self, script_list):
+    #     self.script_list.append(*script_list)
 
     def __call__(self, index, *args, **kwargs):
         return self.script_list[index](*args, **kwargs)
@@ -23,66 +73,98 @@ class Excel_row:
         return self.row
 
 
+class Xml_values:
+    def __init__(self, query_list: list):
+        self.query_list = query_list
+
+    def query_xml_value(self, query):
+        pass
+
 class Excel_fields:
-    def __init__(self, COL_MAX_NUM, fields_list):
+    def __init__(self, COL_MAX_NUM):
         self.COL_MAX_NUM = COL_MAX_NUM
         self.field_ids = range(1, self.COL_MAX_NUM + 1)
         self.fields = [[i for i in self.field_ids], ]
 
-    def __add__(self, other: Excel_row):
-        self.fields.append(other.get_row())
+    def __add__(self, other):
+        self.fields.append(other)
+
+    def query_excel_field(self, query):
+        # xml_value_id
+        # pass to excel_field_id
+        pass
+
 
 
 
 
 
 class XmlConverterPomeshhenija(XmlConverterFabric):
-    @staticmethod
-    def fill_excel_columns(self, dir_path, output_xlsx):
+
+    def __init__(self, config: dict, *args, **kwargs):
+        super().__init__(self, config, *args, **kwargs)
+        # self.config = config
+
+    def main(self):
+        
+        self.excel_fields = Excel_fields(self.COL_MAX_NUM)
+        self.
+        
+        row1 = Row(self.config["caps"][1], self.COL_MAX_NUM, [tm._try_set()])
+        
+        with open(filepath, encoding="utf8") as opened_file:
+            xml_dict = xmltodict.parse(opened_file.read())
+        row1(0, excel_row_with_numerated_columns, column, xml_dict,
+                            dict_keys=field_sequence
+                            )
+        self.excel_fields + row1.get_row() 
+
+
+    def fill_excel_columns(self):
         """
-        Converts all xml file files in dir_path directory into one output_xlsx file,
+        Converts all xml file files in self.confg["xml"] directory into one self.confg["excel"] file,
         where 1 row is one xml file
         """
-        if os.path.isdir(dir_path):
-            self.caps = self.config["caps"]
+        
+        # extract number of excel columns from excel caps
+        # df = pandas.DataFrame([[i for i in range(1, COL_NUM + 1)], ],
+        #                       columns=self.caps)
 
-            # extract number of excel columns from excel caps
-            global COL_NUM
-            COL_NUM = len(self.caps)
+        # list will be converted to data frame
+        # data frame will be converted to excel
+        
 
 
-            # df = pandas.DataFrame([[i for i in range(1, COL_NUM + 1)], ],
-            #                       columns=self.caps)
+        # extracting any xml file in dir to parse
+        file_list = [file for file in os.listdir(self.config["xml"]) if ".xml" == os.path.splitext(file)[-1]]
 
-            # list will be converted to data frame
-            # data frame will be converted to excel
-            ex_range = range(1, COL_NUM + 1)
-            excel_fields = [[i for i in ex_range], ]
+        # creating list of Excel_row objects
+        list_of_rows = [Row(file, self.COL_MAX_NUM) for row_i, file in file_list]
 
-            # we looking for any xml file in dir to parse
-            for row_i, file in enumerate(os.listdir(dir_path)):
-                if ".xml" == os.path.splitext(file)[-1]:
-                    excel_fields.append(["" for i in ex_range])
-                    for field_i, field in enumerate(excel_fields):
-                        excel_fields[field_i]
+        excel_fields = [[i for i in self.ex_range], ]
 
-                    try:
-                        print(f"файл № {df.index.max() + 1}")
-                        afile = os.path.join(dir_path, file)
-                        result = self.get_xml_values(afile)
+                excel_fields.append(["" for i in self.ex_range])
+                for field_i, field in enumerate(excel_fields):
+                    excel_fields[field_i]
 
-                        # !!! here execute xml_values to excel_fields script
-                        df.loc[df.index.max() + 1] = result
-                    except:
-                        print(f"Ошибка чтения {file} ")
-                        print(f"код {sys.exc_info()[0].__dict__}")
-                        traceback.print_exc()
+                try:
+                    print(f"файл № {df.index.max() + 1}")
+                    afile = os.path.join(self.config["xml"], file)
+                    result = self.get_xml_values(afile)
 
-            writer = pandas.ExcelWriter(output_xlsx)
-            df.to_excel(writer, index=False)
-            writer.save()
+                    # !!! here execute xml_values to excel_fields script
+                    df.loc[df.index.max() + 1] = result
+                except:
+                    print(f"Ошибка чтения {file} ")
+                    print(f"код {sys.exc_info()[0].__dict__}")
+                    traceback.print_exc()
 
-            print("Выполнено")
+
+        writer = pandas.ExcelWriter(self.confg["excel"])
+        df.to_excel(writer, index=False)
+        writer.save()
+
+        print("Выполнено")
 
     @staticmethod
     def get_xml_values(filepath):

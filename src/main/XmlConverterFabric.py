@@ -14,25 +14,27 @@ then return result
 
 
 class XmlConverterFabric:
-    def __init__(self, *args, **kwargs):
-        self.config = {
-            "xml": None,
-            "excel": None,
-            "excel_filename": None,
-            "_2d_array": None,  # [["parent_node", "child_node", "child_child_node"]]
-            "caps": None,   # ["Чтение из файла", "Вывод"]
-        }
-
-    # set input and output path
-
-    def set_config(self, config):
-        self.config = config
+    def __init__(self, _config, *args, **kwargs):
+        if not _config:
+            _config = {
+                "xml": None,
+                "excel": None,
+                "excel_filename": None,
+                "_2d_array": None,  # [["parent_node", "child_node", "child_child_node"]]
+                "caps": None,  # ["Чтение из файла", "Вывод"]
+            }
+        self.config = _config
         self.check_config(self)
         self.check_xml_dir(self)
         self.check_excel_dir(self)
         self.check_excel_filename(self)
         # self.check_excel_fields(self)
         self.check_caps(self)
+
+        self.COL_MAX_NUM = len(self.config["caps"])
+        self.ex_range = range(1, self.COL_MAX_NUM + 1)
+
+    # set input and output path
 
 
     @staticmethod
@@ -95,7 +97,7 @@ class XmlConverterFabric:
 
 
 if __name__ == '__main__':
-    fabric = XmlConverterFabric()
+
     config = {"xml": "D:\\PYTHON\\xml-to-excel\\src\\main\\resources\\здания\\xml_здания_Выписки_ч3",
               "excel": "D:\\PYTHON\\xml-to-excel\\", 
               "excel_filename": "Converted.xlsx", 
@@ -104,8 +106,6 @@ if __name__ == '__main__':
               "xml_values_script": [],
               "excel_fields_script": [],
               }
-    config["excel_fields"] = len(config["caps"])
-    
-    fabric.set_config(config)
+    fabric = XmlConverterFabric(config)
     fabric.run()
     print("Test ok")
