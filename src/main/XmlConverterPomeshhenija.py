@@ -11,23 +11,23 @@ import datetime
 class Row:
     def __init__(self, name, _len):
         self.filename = name
-        self.row = ["" for i in _len]
-        self.script_list = []
+        self.row = ["" for i in _len] ##??? delete this
+        self.script_list = [] ###??? delete this
         try:
             with open(self.filename, encoding="utf8") as opened_file:
-                self.xml_dict = xmltodict.parse(opened_file.read())
+                self.xml_nested_dict = xmltodict.parse(opened_file.read())
 
         except:
             print("Xml file read error: ")
             print(sys.exc_info())
 
+        # PHASE 1 - extract xml Data into xml Table! Keep track of to which excel_column The Data will go ;)
+
         self.xml_value_table = []
 
-    def fill_xml__value_table(self):
 
-
-
-        # CAPS_ANALOG = [2, 3,   5, 6, 7,   9, 10, 11, 12, 13, 14, 15,   18, 19, 20]
+#    def fill_xml__value_table(self):
+        simple_excel_column_destination = [2, 3,   5, 6, 7,   9, 10, 11, 12, 13, 14, 15,   18, 19, 20]
         simple_xml_values = [
             ['extract_base_params_room', 'details_statement', 'group_top_requisites', 'registration_number'],
             ['extract_base_params_room', 'details_statement', 'group_top_requisites', 'date_formation'],
@@ -49,11 +49,20 @@ class Row:
             ['extract_base_params_room', 'room_record', 'special_notes'],
         ]
 
-        for column in simple_xml_values:
-            field_sequence = config["fields"][column]
-            tm._try_set(excel_row_with_numerated_columns, column, xml_dict,
-                        dict_keys=field_sequence
-                        )
+        for value_id in simple_xml_values:
+            self.xml_value_table[value_id] = [ simple_excel_column_destination,
+                                               tm._try_get(self.xml_nested_dict, simple_xml_values[value_id])
+                                               ]
+
+
+        # PHASE 2 - now, we have all The Data we need! Now it's time to find our data in Xml_table and push it
+        # to Excel_table.
+        # Simple case:  we pushing one xml_value to one excel_column
+        # Complex case: we pushing multiple xml_values to one excel_column.
+        # * And some other columns can push the same data too!
+
+
+
 
         self.xml_value_table.append()
 

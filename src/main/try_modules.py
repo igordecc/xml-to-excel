@@ -16,6 +16,23 @@ def _try_set(set_list, index, nested_dict, dict_keys=[]):
     except:
         return ''
 
+def _try_get(nested_dict, dict_keys):
+    """
+    Tries to select single node from nested dict and write it to the list at the index.
+
+    :param set_list: will convert to excel
+    :param index: column's index
+    :param nested_dict: was parsed from xml (tree structure)
+    :param dict_keys: key list to navigate the dict tree
+    :return: same value being writen to set_list
+    """
+    try:
+        for dict_key in dict_keys:
+            nested_dict = nested_dict.__getitem__(dict_key)
+        return nested_dict
+    except:
+        return ''
+
 
 def _try(_dict, _fields):
     try:
