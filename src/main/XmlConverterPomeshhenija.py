@@ -9,10 +9,9 @@ import datetime
 
 
 class Row:
-    def __init__(self, name, _len):
+    def __init__(self, name, excel_table_row_len):
         self.filename = name
-        self.row = ["" for i in _len] ##??? delete this
-        self.script_list = [] ###??? delete this
+        self.COL_MAX_NUM = excel_table_row_len
         try:
             with open(self.filename, encoding="utf8") as opened_file:
                 self.xml_nested_dict = xmltodict.parse(opened_file.read())
@@ -61,10 +60,18 @@ class Row:
         # Complex case: we pushing multiple xml_values to one excel_column.
         # * And some other columns can push the same data too!
 
+        self.excel_table_range = range(1, self.COL_MAX_NUM + 1) # excel_table_range
+        excel_id_list = [i for i in self.excel_table_range]
+
+        excel_table_row = [None for i in self.excel_table_range]
+
+        self.excel_table = [excel_id_list, excel_table_row]
+
+        for excel_id in self.excel_table[0]:
+            pass
 
 
 
-        self.xml_value_table.append()
 
 
 
