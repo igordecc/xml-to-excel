@@ -8,9 +8,37 @@ import traceback
 import datetime
 
 
+class Excel_row:
+    def __init__(self, _len, script_list: list):
+        self.row = ["" for i in _len]
+        self.script_list = script_list
+
+    def __call__(self, index, *args, **kwargs):
+        return self.script_list[index](*args, **kwargs)
+
+    def __getitem__(self, item):
+        return self.row[item]
+
+    def get_row(self):
+        return self.row
+
+
+class Excel_fields:
+    def __init__(self, COL_MAX_NUM, fields_list):
+        self.COL_MAX_NUM = COL_MAX_NUM
+        self.field_ids = range(1, self.COL_MAX_NUM + 1)
+        self.fields = [[i for i in self.field_ids], ]
+
+    def __add__(self, other: Excel_row):
+        self.fields.append(other.get_row())
+
+
+
+
+
 class XmlConverterPomeshhenija(XmlConverterFabric):
     @staticmethod
-    def convert(self, dir_path, output_xlsx):
+    def fill_excel_columns(self, dir_path, output_xlsx):
         """
         Converts all xml file files in dir_path directory into one output_xlsx file,
         where 1 row is one xml file
@@ -22,17 +50,28 @@ class XmlConverterPomeshhenija(XmlConverterFabric):
             global COL_NUM
             COL_NUM = len(self.caps)
 
+
+            # df = pandas.DataFrame([[i for i in range(1, COL_NUM + 1)], ],
+            #                       columns=self.caps)
+
+            # list will be converted to data frame
             # data frame will be converted to excel
-            df = pandas.DataFrame([[i for i in range(1, COL_NUM + 1)], ],
-                                  columns=self.caps)
+            ex_range = range(1, COL_NUM + 1)
+            excel_fields = [[i for i in ex_range], ]
 
             # we looking for any xml file in dir to parse
-            for file in os.listdir(dir_path):
+            for row_i, file in enumerate(os.listdir(dir_path)):
                 if ".xml" == os.path.splitext(file)[-1]:
+                    excel_fields.append(["" for i in ex_range])
+                    for field_i, field in enumerate(excel_fields):
+                        excel_fields[field_i]
+
                     try:
                         print(f"файл № {df.index.max() + 1}")
                         afile = os.path.join(dir_path, file)
-                        result = self.parse_one_xml_file(afile)
+                        result = self.get_xml_values(afile)
+
+                        # !!! here execute xml_values to excel_fields script
                         df.loc[df.index.max() + 1] = result
                     except:
                         print(f"Ошибка чтения {file} ")
@@ -46,9 +85,13 @@ class XmlConverterPomeshhenija(XmlConverterFabric):
             print("Выполнено")
 
     @staticmethod
-    def parse_one_xml_file(filepath):
+    def get_xml_values(filepath):
         print(filepath)
         excel_row_with_numerated_columns = {}.fromkeys([i for i in range(1, COL_NUM + 1)], "")
+        config["excel_fields"] = excel_row_with_numerated_columns
+        xml_values = {}
+        config["xml_values"] = xml_values
+
 
         filename = os.path.split(filepath)[-1]
         excel_row_with_numerated_columns[1] = filename
@@ -65,138 +108,135 @@ class XmlConverterPomeshhenija(XmlConverterFabric):
                             )
 
 
-            tm._try_change_value_if(excel_row_with_numerated_columns, 4, xml_dict,
-                                    ['extract_base_params_room', 'room_record', 'object', 'common_data', 'type', 'value'],
-                                    if_condition=lambda value: value == "room_record",
-                                    change_value_to="Сооружение",
-                                    )
-
-            tm._try_date(excel_row_with_numerated_columns, 5, xml_dict,
-                         ['extract_base_params_room', 'room_record', 'record_info', 'registration_date'])
-            
-            # custom queries that may be refactored
-
-            tm._try_isinstance_of_list(excel_row_with_numerated_columns,
-                               8,
-                               xml_dict,
-                               ['extract_base_params_room', 'room_record', 'cad_links', 'old_numbers', "old_number"],
-                               tm._try_set,
-                               do_func=lambda old_number: str(old_number['number_type']['value']) + " " + \
-                                str(old_number['number']) + " ; ",
-                               do_func_is_not=lambda old_number: str(old_number['number_type']['value']) + " " + \
-                                str(old_number['number']) + " ; ",
-                               )
-
-
-            tm._try_isinstance_of_list(excel_row_with_numerated_columns,
-                               16,
-                               xml_dict,
-                               ['extract_base_params_room', 'room_record', 'cad_links', 'land_cad_numbers',
-                                   'land_cad_number'],
-                               tm._try_set,
-                               do_func=lambda land_cad_number: land_cad_number['cad_number'] + " ; ",
-                               do_func_is_not=lambda land_cad_number: land_cad_number['cad_number'] + " ; ",
-                               )
-
-            level_16 = tm._try(xml_dict, ['extract_base_params_room', 'room_record', 'cad_links', 'land_cad_numbers',
-                               'land_cad_number'])
-            if level_16:
-                excel_row_with_numerated_columns[16] = level_16
-            else:
-                excel_row_with_numerated_columns[16] = ''
-                
-
-            try:
-                land_cad_numbers = xml_dict['extract_base_params_room']['room_record']['cad_links']['land_cad_numbers'][
-                    'land_cad_number']
-                if isinstance(land_cad_numbers, list):
-                    excel_row_with_numerated_columns[16] = ''
-                    for land_cad_number in land_cad_numbers:
-                        excel_row_with_numerated_columns[16] += land_cad_number['cad_number'] + " ; "
-                else:
-                    excel_row_with_numerated_columns[16] = land_cad_numbers['cad_number']
-            except:
-                excel_row_with_numerated_columns[16] = ''
-
-            try:
-                print(xml_dict['extract_base_params_room']['room_record']['params']['permitted_uses'])
-                land_cad_numbers = xml_dict['extract_base_params_room']['room_record']['params']['permitted_uses']
-                if isinstance(land_cad_numbers, list):  # when there are many entries - its a list
-                    excel_row_with_numerated_columns[17] = ''
-                    for land_cad_number in land_cad_numbers:
-                        excel_row_with_numerated_columns[17] += land_cad_number['permitted_use']['name'] + " ; "
-                else:  # when there is one entry - its not
-                    excel_row_with_numerated_columns[17] = land_cad_numbers['permitted_use']['name']
-            except:
-                excel_row_with_numerated_columns[17] = ''
-
-
-
-
-            # huge queries
-
-            try:
-                right_records = xml_dict['extract_base_params_room']['right_records']
-
-                def do_records(right_record):
-
-                    def _prepair_try(_try_set, *args):
-                        def h(fields):
-                            return _try_set(*args, fields)
-                        return h
-
-                    _prepair_try(tm._try_set, excel_row_with_numerated_columns, 21, right_record)(['right_record', 'right_holders'])
-
-                    tm.execute_for_one_or_many(tm._try_set(excel_row_with_numerated_columns, 21, right_record, ['right_record', 'right_holders']))
-
-                    column_21_nested_dict = tm._try(excel_row_with_numerated_columns,
-                            right_record,
-                            ['right_record', 'right_holders']
-                            )
-                    function_for_excuting_one_or_many = _prepair_try(tm._try_set,
-                                                            excel_row_with_numerated_columns,
-                                                            21,
-                                                            right_record)
-
-                    tm.execute_for_one_or_many(column_21_nested_dict,
-                                               )
-
-                    tm._try_set(excel_row_with_numerated_columns, 21, right_record, ['right_record', 'right_holders'])
-
-                    # Вид, номер и дата государственной регистрации права
-                    excel_row_with_numerated_columns[22] = "Вид: "
-                    tm._try_append(excel_row_with_numerated_columns, 22, right_record,
-                                   ['right_record', 'right_data', 'right_type', 'value'])  # Вид
-                    excel_row_with_numerated_columns[22] += " ; Номер: "
-                    tm._try_append(excel_row_with_numerated_columns, 22, right_record, ['right_record', 'right_data', 'right_number'])  # Номер
-                    excel_row_with_numerated_columns[22] += " ; Дата регистрации: "
-                    tm._try_date(excel_row_with_numerated_columns, 22, right_record,
-                                 ['right_record', 'record_info', 'registration_date'],
-                                 try_func=tm._try_append)  # Дата регистрации
-
-                    tm._try_set(excel_row_with_numerated_columns, 23, right_record,
-                                ['right_record', 'underlying_documents'])  # Документы-основания
-                    tm._try_set(excel_row_with_numerated_columns, 24, xml_dict,
-                                ['extract_base_params_room', 'right_records', 'right_record',
-                                 'restrict_record'])  # Ограничение прав и обременение объекта недвижимости
-                    tm._try_set(excel_row_with_numerated_columns, 24, xml_dict,
-                                ['extract_base_params_room', 'right_records', 'right_record', 'restrict_records',
-                                 'restrict_record'])  # Ограничение прав и обременение объекта недвижимости
-
-                    tm._try_set(excel_row_with_numerated_columns, 25, right_record, ['right_record',
-                                                              'underlying_documents'])  # Сведения о наличии решения об изъятии объекта недвижимости для государственных и муниципальных нужд
-                    tm._try_set(excel_row_with_numerated_columns, 26, right_record, ['right_record',
-                                                              'third_party_consents'])  # Сведения об осуществлении государственной регистрации прав без необходимого в силу закона согласия третьего лица, органа
-
-                # really common situation of choosing from two
-                #   one value - xml converts to one item (which is not the element of a list!)
-                #   two or more - xml converts to the list of multiple records
-                tm.execute_for_one_or_many(right_records, do_records)
-            except:
-                pass
-
-
-
+            # tm._try_change_value_if(excel_row_with_numerated_columns, 4, xml_dict,
+            #                         ['extract_base_params_room', 'room_record', 'object', 'common_data', 'type', 'value'],
+            #                         if_condition=lambda value: value == "room_record",
+            #                         change_value_to="Сооружение",
+            #                         )
+            #
+            # tm._try_date(excel_row_with_numerated_columns, 5, xml_dict,
+            #              ['extract_base_params_room', 'room_record', 'record_info', 'registration_date'])
+            #
+            # # custom queries that may be refactored
+            #
+            # tm._try_isinstance_of_list(excel_row_with_numerated_columns,
+            #                    8,
+            #                    xml_dict,
+            #                    ['extract_base_params_room', 'room_record', 'cad_links', 'old_numbers', "old_number"],
+            #                    tm._try_set,
+            #                    do_func=lambda old_number: str(old_number['number_type']['value']) + " " + \
+            #                     str(old_number['number']) + " ; ",
+            #                    do_func_is_not=lambda old_number: str(old_number['number_type']['value']) + " " + \
+            #                     str(old_number['number']) + " ; ",
+            #                    )
+            #
+            #
+            # tm._try_isinstance_of_list(excel_row_with_numerated_columns,
+            #                    16,
+            #                    xml_dict,
+            #                    ['extract_base_params_room', 'room_record', 'cad_links', 'land_cad_numbers',
+            #                        'land_cad_number'],
+            #                    tm._try_set,
+            #                    do_func=lambda land_cad_number: land_cad_number['cad_number'] + " ; ",
+            #                    do_func_is_not=lambda land_cad_number: land_cad_number['cad_number'] + " ; ",
+            #                    )
+            #
+            # level_16 = tm._try(xml_dict, ['extract_base_params_room', 'room_record', 'cad_links', 'land_cad_numbers',
+            #                    'land_cad_number'])
+            # if level_16:
+            #     excel_row_with_numerated_columns[16] = level_16
+            # else:
+            #     excel_row_with_numerated_columns[16] = ''
+            #
+            #
+            # try:
+            #     land_cad_numbers = xml_dict['extract_base_params_room']['room_record']['cad_links']['land_cad_numbers'][
+            #         'land_cad_number']
+            #     if isinstance(land_cad_numbers, list):
+            #         excel_row_with_numerated_columns[16] = ''
+            #         for land_cad_number in land_cad_numbers:
+            #             excel_row_with_numerated_columns[16] += land_cad_number['cad_number'] + " ; "
+            #     else:
+            #         excel_row_with_numerated_columns[16] = land_cad_numbers['cad_number']
+            # except:
+            #     excel_row_with_numerated_columns[16] = ''
+            #
+            # try:
+            #     print(xml_dict['extract_base_params_room']['room_record']['params']['permitted_uses'])
+            #     land_cad_numbers = xml_dict['extract_base_params_room']['room_record']['params']['permitted_uses']
+            #     if isinstance(land_cad_numbers, list):  # when there are many entries - its a list
+            #         excel_row_with_numerated_columns[17] = ''
+            #         for land_cad_number in land_cad_numbers:
+            #             excel_row_with_numerated_columns[17] += land_cad_number['permitted_use']['name'] + " ; "
+            #     else:  # when there is one entry - its not
+            #         excel_row_with_numerated_columns[17] = land_cad_numbers['permitted_use']['name']
+            # except:
+            #     excel_row_with_numerated_columns[17] = ''
+            #
+            #
+            #
+            #
+            # # huge queries
+            #
+            # try:
+            #     right_records = xml_dict['extract_base_params_room']['right_records']
+            #
+            #     def do_records(right_record):
+            #
+            #         def _prepair_try(_try_set, *args):
+            #             def h(fields):
+            #                 return _try_set(*args, fields)
+            #             return h
+            #
+            #         _prepair_try(tm._try_set, excel_row_with_numerated_columns, 21, right_record)(['right_record', 'right_holders'])
+            #
+            #         tm.execute_for_one_or_many(tm._try_set(excel_row_with_numerated_columns, 21, right_record, ['right_record', 'right_holders']))
+            #
+            #         column_21_nested_dict = tm._try(excel_row_with_numerated_columns,
+            #                 right_record,
+            #                 ['right_record', 'right_holders']
+            #                 )
+            #         function_for_excuting_one_or_many = _prepair_try(tm._try_set,
+            #                                                 excel_row_with_numerated_columns,
+            #                                                 21,
+            #                                                 right_record)
+            #
+            #         tm.execute_for_one_or_many(column_21_nested_dict,
+            #                                    )
+            #
+            #         tm._try_set(excel_row_with_numerated_columns, 21, right_record, ['right_record', 'right_holders'])
+            #
+            #         # Вид, номер и дата государственной регистрации права
+            #         excel_row_with_numerated_columns[22] = "Вид: "
+            #         tm._try_append(excel_row_with_numerated_columns, 22, right_record,
+            #                        ['right_record', 'right_data', 'right_type', 'value'])  # Вид
+            #         excel_row_with_numerated_columns[22] += " ; Номер: "
+            #         tm._try_append(excel_row_with_numerated_columns, 22, right_record, ['right_record', 'right_data', 'right_number'])  # Номер
+            #         excel_row_with_numerated_columns[22] += " ; Дата регистрации: "
+            #         tm._try_date(excel_row_with_numerated_columns, 22, right_record,
+            #                      ['right_record', 'record_info', 'registration_date'],
+            #                      try_func=tm._try_append)  # Дата регистрации
+            #
+            #         tm._try_set(excel_row_with_numerated_columns, 23, right_record,
+            #                     ['right_record', 'underlying_documents'])  # Документы-основания
+            #         tm._try_set(excel_row_with_numerated_columns, 24, xml_dict,
+            #                     ['extract_base_params_room', 'right_records', 'right_record',
+            #                      'restrict_record'])  # Ограничение прав и обременение объекта недвижимости
+            #         tm._try_set(excel_row_with_numerated_columns, 24, xml_dict,
+            #                     ['extract_base_params_room', 'right_records', 'right_record', 'restrict_records',
+            #                      'restrict_record'])  # Ограничение прав и обременение объекта недвижимости
+            #
+            #         tm._try_set(excel_row_with_numerated_columns, 25, right_record, ['right_record',
+            #                                                   'underlying_documents'])  # Сведения о наличии решения об изъятии объекта недвижимости для государственных и муниципальных нужд
+            #         tm._try_set(excel_row_with_numerated_columns, 26, right_record, ['right_record',
+            #                                                   'third_party_consents'])  # Сведения об осуществлении государственной регистрации прав без необходимого в силу закона согласия третьего лица, органа
+            #
+            #     # really common situation of choosing from two
+            #     #   one value - xml converts to one item (which is not the element of a list!)
+            #     #   two or more - xml converts to the list of multiple records
+            #     tm.execute_for_one_or_many(right_records, do_records)
+            # except:
+            #     pass
 
 
 
