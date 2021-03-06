@@ -1,10 +1,17 @@
+.idea/
+.pytest_cache/
 *.xml
-*/__pycache__
+__pycache__/
 *.pdf
 *.xlsx
+*.sig
 *.xsd
 *.doc
 *.rar
 */xml
 */xmls_test
-*/extract_base_params_construction_v01 -----------
+/extract_base_params_construction_v01 -----------/
+/extract_base_params_build_v01 - здания/
+/src/main/resources/сооружения/xml_сооружения_29.12.2020/
+/src/main/resources/здания/xml_здания_Выписки_ч3/
+/src/main/resources/сооружения/результаты_сооружения/
