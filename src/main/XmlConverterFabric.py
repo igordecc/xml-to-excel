@@ -14,15 +14,10 @@ then return result
 
 
 class XmlConverterFabric:
-    def __init__(self, _config, *args, **kwargs):
+    def __init__(self, _config: dict, row_class: type(type), *args, **kwargs):
         if not _config:
-            _config = {
-                "xml": None,
-                "excel": None,
-                "excel_filename": None,
-                "_2d_array": None,  # [["parent_node", "child_node", "child_child_node"]]
-                "caps": None,  # ["Чтение из файла", "Вывод"]
-            }
+            raise Exception("No config specified!")
+        self.RowClass = row_class
         self.config = _config
         self.check_config(self)
         self.check_xml_dir(self)
@@ -30,8 +25,10 @@ class XmlConverterFabric:
         self.check_excel_filename(self)
         # self.check_excel_fields(self)
         self.check_caps(self)
-
-        self.COL_MAX_NUM = len(self.config["caps"])
+        if self.config["caps"]:
+            self.COL_MAX_NUM = len(self.config["caps"])
+        else:
+            self.COL_MAX_NUM = 0
         self.ex_range = range(1, self.COL_MAX_NUM + 1)
 
     # set input and output path
@@ -70,8 +67,6 @@ class XmlConverterFabric:
     def check_caps(self):
         if not self.config["caps"]:
             raise Exception("Set caps")
-        if not isinstance(self.config["fields"], list):
-            raise Exception("Bad Fields")
 
     @staticmethod
     def check_config(self):
@@ -95,12 +90,30 @@ class XmlConverterFabric:
     # def convert(self, *args, **kwargs):
     #     print("converted")
 
+    def run(self):
+        """
+        Converts all xml file files in self.confg["xml"] directory into one self.confg["excel"] file,
+        where 1 row is one xml file
+        """
+        # extracting any xml file in dir to parse
+        file_list = [os.path.join(self.config["xml"], file) for file in os.listdir(self.config["xml"]) if ".xml" == os.path.splitext(file)[-1]]
+
+        # creating list of Excel_row objects
+        list_of_rows = [[i for i in range(1, self.COL_MAX_NUM + 1)]]
+        for i in [self.RowClass(file, col_max=self.COL_MAX_NUM)() for file in file_list]:
+            list_of_rows.append(i)
+
+        df = pandas.DataFrame(list_of_rows, columns = self.config["caps"])
+        writer = pandas.ExcelWriter(os.path.join(self.config["excel"], self.config["excel_filename"]))
+        df.to_excel(writer, index=False)
+        writer.save()
+
 
 if __name__ == '__main__':
-
-    config = {"xml": "D:\\PYTHON\\xml-to-excel\\src\\main\\resources\\здания\\xml_здания_Выписки_ч3",
-              "excel": "D:\\PYTHON\\xml-to-excel\\", 
-              "excel_filename": "Converted.xlsx", 
+    config = {
+              "xml": "D:\\PYTHON\\xml-to-excel\\src\\main\\resources\\здания\\xml_здания_Выписки_ч3",
+              "excel": "D:\\PYTHON\\xml-to-excel\\",
+              "excel_filename": "Converted.xlsx",
               "caps": ["123"],
               "xml_values": {},
               "xml_values_script": [],
