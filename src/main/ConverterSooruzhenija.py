@@ -115,6 +115,16 @@ class PomeshhenijaRow:
         s25 = lambda s: "".join( [str(tm._try_get(s, ['permitted_use', 'name'] )), " ; "] )
         self.xml_value_table.append("".join([str(i) for i in tm.iflist(permitted_uses, s25)]))
 
+        # --- 28
+        anchor6 = len(self.xml_value_table)
+        rights = tm._try_get(self.xml_nested_dict, ['extract_base_params_construction', 'right_records'])
+        self.xml_value_table.append(str(dict(rights)))
+
+        # --- 29
+        anchor7 = len(self.xml_value_table)
+        owner_rights = tm._try_get(self.xml_nested_dict, ['extract_base_params_construction', 'ownerless_right_records'])
+        self.xml_value_table.append(str(dict(owner_rights)))
+
 
         # PHASE 2 - now, we have all The Data we need! Now it's time to find our data in Xml_table and push it
         # to Excel_table.
@@ -145,8 +155,21 @@ class PomeshhenijaRow:
 
         # anchor3 - field #8
         self.excel_table[8 - 1] = self.xml_value_table[anchor3]
-        
 
+        # anchor4 - field #23
+        self.excel_table[23 - 1] = self.xml_value_table[anchor4]
+
+        # anchor4 - field #24
+        self.excel_table[24 - 1] = self.xml_value_table[anchor4+1] + self.xml_value_table[anchor4+2]
+
+        # anchor5 - field #25
+        self.excel_table[25 - 1] = "".join(self.xml_value_table[anchor5])
+
+        # anchor6 - field #28
+        self.excel_table[28 - 1] = self.xml_value_table[anchor6]
+
+        # anchor7 - field #29
+        self.excel_table[29 - 1] = self.xml_value_table[anchor7]
 
         return self.excel_table
 
@@ -156,7 +179,7 @@ class PomeshhenijaRow:
 
 if __name__ == '__main__':
     config = {
-        "xml": "D:\\PYTHON\\xml-to-excel\\src\\main\\resources\\сооружения\\xml_сооружения_29.12.2020",
+        "xml": "D:\\PYTHON\\xml-to-excel\\src\\main\\resources\\сооружения\\xml_сооружения",
         "excel": "D:\\PYTHON\\xml-to-excel\\",
         "excel_filename": "Sooruzhenija.xlsx",
         "caps": [
