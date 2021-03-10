@@ -8,6 +8,7 @@ import traceback
 import datetime
 
 
+
 class PomeshhenijaRow:
     def __init__(self, name, col_max=26, *args, **kwargs):
         self.filename = name
@@ -96,8 +97,12 @@ class PomeshhenijaRow:
 
         self.xml_value_table.append("".join(str(dict(right_holder))for right_holder in right_holders))
 
+        # --- 18
+        record_info = [tm._try_get(element, ['record_info']) for element in tm.iflist(right_records, s17)]
+
+        # --- 19
+
         # --- 20
-        anchor6 = len(self.xml_value_table)
         rights = tm._try_get(self.xml_nested_dict, ['extract_base_params_land', 'restrict_records'])
         self.xml_value_table.append(str(dict(rights)))
         #
@@ -138,8 +143,14 @@ class PomeshhenijaRow:
         # anchor5 - field #17
         self.excel_table[17 - 1] = self.xml_value_table[anchor5]
 
-        # anchor6 - field #20
-        self.excel_table[20 - 1] = self.xml_value_table[anchor6]
+        # ancho6 - field 18
+        self.excel_table[18 - 1] = self.xml_value_table[anchor5+1]
+
+        # anchor9 - field #19
+        self.excel_table[19 - 1] = self.xml_value_table[anchor5+2]
+
+        # anchor9 - field #20
+        self.excel_table[20 - 1] = self.xml_value_table[anchor5+3]
 
         return self.excel_table
 
