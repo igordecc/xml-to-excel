@@ -27,7 +27,7 @@ class PomeshhenijaRow:
 
         self.xml_value_table = []
 
-        ANCHOR0 = len(self.xml_value_table)
+        anchor0 = len(self.xml_value_table)
         # Oh, I'm appending xml table iteratively
         # then I'm appending excel iteratively ( but just for #THIS_CASE)
         # to better find my special place, I will mark this place with ANCHOR!
@@ -59,6 +59,63 @@ class PomeshhenijaRow:
         for value_id, value in enumerate(simple_xml_values):
             self.xml_value_table.append(tm._try_get(self.xml_nested_dict, value))
 
+        # --- 6
+        anchor1 = len(self.xml_value_table)
+        self.xml_value_table.append(tm._try_get(self.xml_nested_dict, ['extract_base_params_construction',
+                                           'construction_record', 'object', 'common_data', 'type', 'value']))
+
+        # --- 7
+        anchor2 = len(self.xml_value_table)
+        dt = tm._try_get(self.xml_nested_dict, ['extract_base_params_construction',
+                                                            'construction_record', 'record_info', 'registration_date'])
+
+        if dt:
+            dt = datetime.datetime.strptime(dt, "%Y-%m-%dT%H:%M:%S%z").date()
+        self.xml_value_table.append(dt)
+
+        # --- 8
+        anchor3 = len(self.xml_value_table)
+        old_numbers = tm._try_get(self.xml_nested_dict,
+                                  ['extract_base_params_construction', 'construction_record',
+                                                         'cad_links', 'old_numbers', "old_number"])
+        s8 = lambda s: "".join([str(tm._try_get(s, ["number_type", "value"])),
+                                " ",
+                                str(tm._try_get(s, ["number", ])),
+                                " ; "
+                                ])
+        self.xml_value_table.append("".join([str(i) for i in tm.iflist(old_numbers, s8)]))
+
+        # --- 23
+        anchor4 = len(self.xml_value_table)
+        land_cad_numbers = tm._try_get(self.xml_nested_dict,
+                                       ['extract_base_params_construction','construction_record', 'cad_links',
+                                        'land_cad_numbers', 'land_cad_number'])
+        s23 = lambda s: "".join( [str(tm._try_get(s, ["cad_number"])), " ; "] )
+        self.xml_value_table.append("".join([str(i) for i in tm.iflist(land_cad_numbers, s23)]))
+
+        # --- 24
+        room_cad_numbers = tm._try_get(self.xml_nested_dict,
+                                       ['extract_base_params_construction', 'construction_record', 'cad_links',
+                                        'room_cad_numbers', 'room_cad_number'])
+        s24 = lambda s: "".join( [str(tm._try_get(s, ["cad_number"])), " ; "] )
+        self.xml_value_table.append("".join([str(i) for i in tm.iflist(room_cad_numbers, s24)]))
+
+        # --- 24 (APPEND TO PREVIOUS)
+        car_parking_cad_numbers = tm._try_get(self.xml_nested_dict,
+                                              ['extract_base_params_construction', 'construction_record', 'cad_links',
+                                               'car_parking_space_cad_numbers', 'car_parking_space_cad_number'])
+        self.xml_value_table.append("".join([str(i) for i in tm.iflist(car_parking_cad_numbers, s24)]))
+
+        # --- 25
+        anchor5 = len(self.xml_value_table)
+        permitted_uses = tm._try_get(self.xml_nested_dict,
+                                     ['extract_base_params_construction', 'construction_record', 'params',
+                                         'permitted_uses']
+                                     )
+        s25 = lambda s: "".join( [str(tm._try_get(s, ['permitted_use', 'name'] )), " ; "] )
+        self.xml_value_table.append("".join([str(i) for i in tm.iflist(permitted_uses, s25)]))
+
+
         # PHASE 2 - now, we have all The Data we need! Now it's time to find our data in Xml_table and push it
         # to Excel_table.
         # Simple case:  we pushing one xml_value to one excel_column
@@ -75,7 +132,21 @@ class PomeshhenijaRow:
         # simple excel fields
         simple_excel__column_destination = [2, 3, 4, 5,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,  26, 27]
         for i, excel_id in enumerate(simple_excel__column_destination):
-            self.excel_table[excel_id] = self.xml_value_table[i + ANCHOR0]
+            self.excel_table[excel_id - 1] = self.xml_value_table[i + anchor0]
+
+        # anchor1 - field #6
+        if self.xml_value_table[anchor1] == "construction_record":
+            self.excel_table[6 - 1] = "Сооружение"
+        else:
+            self.excel_table[6 - 1] = self.xml_value_table[anchor1]
+
+        # anchor2 - field #7
+        self.excel_table[7 - 1] = self.xml_value_table[anchor2]
+
+        # anchor3 - field #8
+        self.excel_table[8 - 1] = self.xml_value_table[anchor3]
+        
+
 
         return self.excel_table
 

@@ -16,6 +16,14 @@ def _try_set(set_list, index, nested_dict, dict_keys=[]):
     except:
         return ''
 
+
+def iflist(mblist, lmbd) -> list:
+    if isinstance(mblist, list):
+        return [lmbd(i) for i in mblist]
+    else:
+        return [lmbd(mblist)]
+
+
 def _try_get(nested_dict, dict_keys):
     """
     Tries to select single node from nested dict and write it to the list at the index.
