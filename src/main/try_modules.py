@@ -1,22 +1,3 @@
-def _try_set(set_list, index, nested_dict, dict_keys=[]):
-    """
-    Tries to select single node from nested dict and write it to the list at the index.
-
-    :param set_list: will convert to excel
-    :param index: column's index
-    :param nested_dict: was parsed from xml (tree structure)
-    :param dict_keys: key list to navigate the dict tree
-    :return: same value being writen to set_list
-    """
-    try:
-        for dict_key in dict_keys:
-            nested_dict = nested_dict.__getitem__(dict_key)
-        set_list[index] = str(nested_dict)
-        return nested_dict
-    except:
-        return ''
-
-
 def iflist(mblist, lmbd) -> list:
     if isinstance(mblist, list):
         return [lmbd(i) for i in mblist]
@@ -47,6 +28,27 @@ def _try(_dict, _fields):
         return _dict[_fields]
     except:
         return None
+
+
+
+# -----------------
+def _try_set(set_list, index, nested_dict, dict_keys=[]):
+    """
+    Tries to select single node from nested dict and write it to the list at the index.
+
+    :param set_list: will convert to excel
+    :param index: column's index
+    :param nested_dict: was parsed from xml (tree structure)
+    :param dict_keys: key list to navigate the dict tree
+    :return: same value being writen to set_list
+    """
+    try:
+        for dict_key in dict_keys:
+            nested_dict = nested_dict.__getitem__(dict_key)
+        set_list[index] = str(nested_dict)
+        return nested_dict
+    except:
+        return ''
 
 
 def _try_append(set_list, index, nested_dict, dict_keys=[]):

@@ -76,7 +76,7 @@ class ONSRow:
         # simple excel fields
         simple_excel__column_destination = [2, 3,  6, 7,  9,  11,  13, 14,  16, 17]
         for i, excel_id in enumerate(simple_excel__column_destination):
-            self.excel_table[excel_id] = self.xml_value_table[i + ANCHOR0]
+            self.excel_table[excel_id - 1] = self.xml_value_table[i + ANCHOR0]
 
         return self.excel_table
 

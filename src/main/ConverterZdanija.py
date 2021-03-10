@@ -55,6 +55,8 @@ class ZdanijaRow:
         for value_id, value in enumerate(simple_xml_values):
             self.xml_value_table.append(tm._try_get(self.xml_nested_dict, value))
 
+        # ---
+
         # PHASE 2 - now, we have all The Data we need! Now it's time to find our data in Xml_table and push it
         # to Excel_table.
         # Simple case:  we pushing one xml_value to one excel_column
@@ -71,7 +73,7 @@ class ZdanijaRow:
         # simple excel fields
         simple_excel__column_destination = [2, 3,  6, 7,  9, 10, 11, 12, 13, 14, 15, 16,  20, 21]
         for i, excel_id in enumerate(simple_excel__column_destination):
-            self.excel_table[excel_id] = self.xml_value_table[i + ANCHOR0]
+            self.excel_table[excel_id - 1] = self.xml_value_table[i + ANCHOR0]
 
         return self.excel_table
 
@@ -81,6 +83,7 @@ class ZdanijaRow:
 
 if __name__ == '__main__':
     config = {
+        # TODO GET RIGHT XMLS!!!!!!!!!!
         "xml": "D:\\PYTHON\\xml-to-excel\\src\\main\\resources\\здания\\xml_здания_Выписки_ч3", # левые выписки, найти нужные
         "excel": "D:\\PYTHON\\xml-to-excel\\",
         "excel_filename": "Zdanija.xlsx",

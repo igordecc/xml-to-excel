@@ -115,6 +115,7 @@ class PomeshhenijaRow:
         s25 = lambda s: "".join( [str(tm._try_get(s, ['permitted_use', 'name'] )), " ; "] )
         self.xml_value_table.append("".join([str(i) for i in tm.iflist(permitted_uses, s25)]))
 
+        # TODO remake into more objects
         # --- 28
         anchor6 = len(self.xml_value_table)
         rights = tm._try_get(self.xml_nested_dict, ['extract_base_params_construction', 'right_records'])

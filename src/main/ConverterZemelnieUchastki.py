@@ -52,6 +52,56 @@ class PomeshhenijaRow:
         for value_id, value in enumerate(simple_xml_values):
             self.xml_value_table.append(tm._try_get(self.xml_nested_dict, value))
 
+        # --- 4 == 6 soor
+        anchor1 = len(self.xml_value_table)
+        self.xml_value_table.append(tm._try_get(self.xml_nested_dict, ['extract_base_params_land',
+                                                                       'land_record', 'object', 'common_data',
+                                                                       'type', 'value']))
+
+        # --- 5 == 7 soor
+        anchor2 = len(self.xml_value_table)
+        dt = tm._try_get(self.xml_nested_dict, ['extract_base_params_land',
+                                                'land_record', 'record_info', 'registration_date'])
+        if dt:
+            dt = datetime.datetime.strptime(dt, "%Y-%m-%dT%H:%M:%S%z").date()
+        self.xml_value_table.append(dt)
+
+        # --- 8
+        anchor3 = len(self.xml_value_table)
+        old_numbers = tm._try_get(self.xml_nested_dict,
+                                  ['extract_base_params_land', 'land_record',
+                                   'cad_links', 'old_numbers', "old_number"])
+        s8 = lambda s: "".join([str(tm._try_get(s, ["number_type", "value"])),
+                                " ",
+                                str(tm._try_get(s, ["number", ])),
+                                " ; "
+                                ])
+        self.xml_value_table.append("".join([str(i) for i in tm.iflist(old_numbers, s8)]))
+
+        # --- 12 == 23 soor
+        anchor4 = len(self.xml_value_table)
+        land_cad_numbers = tm._try_get(self.xml_nested_dict,
+                                       ['extract_base_params_land', 'land_record', 'cad_links', 'included_objects',
+                                           'included_object']
+                                       )
+        s12 = lambda s: "".join([str(tm._try_get(s, ["cad_number"])), " ; "])
+        self.xml_value_table.append("".join([str(i) for i in tm.iflist(land_cad_numbers, s12)]))
+
+        # TODO remake into more objects
+        # --- 17 == 28 soor
+        anchor5 = len(self.xml_value_table)
+        right_records = tm._try_get(self.xml_nested_dict, ['extract_base_params_land', 'right_records'])
+        s17 = lambda s: tm._try_get(s, ["right_record"])
+        right_holders = [tm._try_get(element, ['right_holders', 'right_holder']) for element in tm.iflist(right_records, s17)]
+
+        self.xml_value_table.append("".join(str(dict(right_holder))for right_holder in right_holders))
+
+        # --- 20
+        anchor6 = len(self.xml_value_table)
+        rights = tm._try_get(self.xml_nested_dict, ['extract_base_params_land', 'restrict_records'])
+        self.xml_value_table.append(str(dict(rights)))
+        #
+
         # PHASE 2 - now, we have all The Data we need! Now it's time to find our data in Xml_table and push it
         # to Excel_table.
         # Simple case:  we pushing one xml_value to one excel_column
@@ -68,7 +118,28 @@ class PomeshhenijaRow:
         # simple excel fields
         simple_excel__column_destination = [2, 3,  6, 7,  9, 10, 11,  13, 14, 15, 16]
         for i, excel_id in enumerate(simple_excel__column_destination):
-            self.excel_table[excel_id] = self.xml_value_table[i + ANCHOR0]
+            self.excel_table[excel_id - 1] = self.xml_value_table[i + ANCHOR0]
+
+        # anchor1 - field #4
+        if self.xml_value_table[anchor1] == "land_record":
+            self.excel_table[4 - 1] = "Земельный участок"
+        else:
+            self.excel_table[4 - 1] = self.xml_value_table[anchor1]
+
+        # anchor2 - field #5
+        self.excel_table[5 - 1] = self.xml_value_table[anchor2]
+
+        # anchor3 - field #8
+        self.excel_table[8 - 1] = self.xml_value_table[anchor3]
+
+        # anchor4 - field #12
+        self.excel_table[12 - 1] = self.xml_value_table[anchor4]
+
+        # anchor5 - field #17
+        self.excel_table[17 - 1] = self.xml_value_table[anchor5]
+
+        # anchor6 - field #20
+        self.excel_table[20 - 1] = self.xml_value_table[anchor6]
 
         return self.excel_table
 

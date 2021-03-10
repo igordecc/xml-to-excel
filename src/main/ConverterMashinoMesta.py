@@ -71,7 +71,7 @@ class PomeshhenijaRow:
         # simple excel fields
         simple_excel__column_destination = [2, 3,   5, 6, 7,   9, 10, 11, 12, 13, 14, 15,   18, 19, 20]
         for i, excel_id in enumerate(simple_excel__column_destination):
-            self.excel_table[excel_id] = self.xml_value_table[i + ANCHOR0]
+            self.excel_table[excel_id - 1] = self.xml_value_table[i + ANCHOR0]
 
         return self.excel_table
 
