@@ -173,10 +173,24 @@ class PomeshhenijaRow:
 
 
 if __name__ == '__main__':
+    def excel_format(writer):
+        sheet_setting = writer.sheets["Sheet1"]
+        wrap_format = writer.book.add_format({'text_wrap': True})
+        wid = 20
+        sheet_setting.set_column(0, 7, width=wid, cell_format=wrap_format)
+        sheet_setting.set_column(8, 8, width=wid * 3, cell_format=wrap_format)
+        sheet_setting.set_column(9, 10, width=wid * 3, cell_format=wrap_format)
+        sheet_setting.set_column(11, 12, width=wid * 6, cell_format=wrap_format)
+        sheet_setting.set_column(13, 14, width=wid, cell_format=wrap_format)
+        sheet_setting.set_column(15, 15, width=wid * 6, cell_format=wrap_format)
+        sheet_setting.set_column(16, 17, width=wid * 3, cell_format=wrap_format)
+        sheet_setting.set_column(18, 19, width=wid * 12, cell_format=wrap_format)
+        return writer
     config = {
         "xml": "D:\\PYTHON\\xml-to-excel\\src\\main\\resources\\земельные_участки",
         "excel": "D:\\PYTHON\\xml-to-excel\\",
         "excel_filename": "ZU.xlsx",
+        "excel_format" : excel_format,
         "caps": [
             'Наименование файла',#1
             'Номер выписки',#2

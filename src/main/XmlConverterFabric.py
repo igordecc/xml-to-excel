@@ -49,20 +49,6 @@ class XmlConverterFabric:
         if not os.path.splitext(self.config["excel_filename"])[1] == ".xlsx":
             raise Exception("Wrong excel file extension")
 
-    # @staticmethod
-    # def check_excel_fields(self):
-    #     if not self.config["excel_fields"]:
-    #         raise Exception("Set fields")
-    #     if not isinstance(self.config["excel_fields"], list):
-    #         raise Exception("Bad Fields")
-    #
-    # @staticmethod
-    # def check_fields(self):
-    #     if not self.config["fields"]:
-    #         raise Exception("Set fields")
-    #     if not isinstance(self.config["fields"], list):
-    #         raise Exception("Bad Fields")
-
     @staticmethod
     def check_caps(self):
         if not self.config["caps"]:
@@ -76,19 +62,6 @@ class XmlConverterFabric:
             for field in empty_fields:
                 print(f"    {field}")
             raise Exception
-
-    # def run(self):
-    #     self.check_config(self)
-    #     if os.path.exists(self.config["xml"]) and os.path.isdir(os.path.dirname(self.config["excel"])):
-    #         self.convert(self, self.config["xml"], os.path.join(self.config["excel"], self.config["excel_filename"]))
-    #
-    #         print("Running the converter...")
-    #     else:
-    #         raise Exception("Bad xml dir or excel dir")
-    #
-    # @staticmethod
-    # def convert(self, *args, **kwargs):
-    #     print("converted")
 
     def run(self):
         """
@@ -106,19 +79,35 @@ class XmlConverterFabric:
         df = pandas.DataFrame(list_of_rows, columns = self.config["caps"])
         writer = pandas.ExcelWriter(os.path.join(self.config["excel"], self.config["excel_filename"]))
         df.to_excel(writer, index=False)
+        if self.config.get("excel_format"):
+            writer = self.config["excel_format"](writer)
         writer.save()
 
 
 if __name__ == '__main__':
+    def excel_format(writer):
+        sheet_setting = writer.sheets["Sheet1"]
+        wrap_format = writer.book.add_format({'text_wrap': True})
+        wid = 20
+        sheet_setting.set_column(0, 7, width=wid, cell_format=wrap_format)
+        sheet_setting.set_column(8, 8, width=wid * 3, cell_format=wrap_format)
+        sheet_setting.set_column(9, 10, width=wid * 3, cell_format=wrap_format)
+        sheet_setting.set_column(11, 12, width=wid * 6, cell_format=wrap_format)
+        sheet_setting.set_column(13, 14, width=wid, cell_format=wrap_format)
+        sheet_setting.set_column(15, 15, width=wid * 6, cell_format=wrap_format)
+        sheet_setting.set_column(16, 17, width=wid * 3, cell_format=wrap_format)
+        sheet_setting.set_column(18, 19, width=wid * 12, cell_format=wrap_format)
+        return writer
     config = {
-              "xml": "D:\\PYTHON\\xml-to-excel\\src\\main\\resources\\здания\\xml_здания_Выписки_ч3",
-              "excel": "D:\\PYTHON\\xml-to-excel\\",
-              "excel_filename": "Converted.xlsx",
-              "caps": ["123"],
-              "xml_values": {},
-              "xml_values_script": [],
-              "excel_fields_script": [],
-              }
+        "xml": "D:\\PYTHON\\xml-to-excel\\src\\main\\resources\\здания\\xml_здания_Выписки_ч3",
+        "excel": "D:\\PYTHON\\xml-to-excel\\",
+        "excel_filename": "Converted.xlsx",
+        "caps": ["123"],
+        "xml_values": {},
+        "xml_values_script": [],
+        "excel_fields_script": [],
+        "excel_format": excel_format,
+    }
     fabric = XmlConverterFabric(config)
     fabric.run()
     print("Test ok")
