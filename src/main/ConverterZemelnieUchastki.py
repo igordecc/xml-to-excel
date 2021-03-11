@@ -24,6 +24,12 @@ class PomeshhenijaRow:
             traceback.print_exc()
             return lambda x: None
 
+        # PHASE 0 - parse etree. enjoy XPath!
+
+        tree = et.parse(self.filename)
+        root = tree.getroot()
+        root.findall("")
+
         # PHASE 1 - extract xml Data into xml Table! Keep track of to which excel_column The Data will go ;)
 
         self.xml_value_table = []
@@ -69,15 +75,12 @@ class PomeshhenijaRow:
 
         # --- 8
         anchor3 = len(self.xml_value_table)
-        old_numbers = tm._try_get(self.xml_nested_dict,
-                                  ['extract_base_params_land', 'land_record',
-                                   'cad_links', 'old_numbers', "old_number"])
-        s8 = lambda s: "".join([str(tm._try_get(s, ["number_type", "value"])),
-                                " ",
-                                str(tm._try_get(s, ["number", ])),
-                                " ; "
-                                ])
-        self.xml_value_table.append("".join([str(i) for i in tm.iflist(old_numbers, s8)]))
+        old_numbers = "; \n\n".join([", ".join([str(i).strip() for i in j.itertext() if str(i).strip()]) for j in
+                            root.findall('cad_links/old_numbers')])
+        if old_numbers:
+            self.xml_value_table.append(old_numbers)
+        else:
+            self.xml_value_table.append("-")
 
         # --- 12 == 23 soor
         anchor4 = len(self.xml_value_table)
@@ -91,48 +94,31 @@ class PomeshhenijaRow:
         # TODO remake into more objects
         # --- 17 == 28 soor
         anchor5 = len(self.xml_value_table)
-        right_records = tm._try_get(self.xml_nested_dict, ['extract_base_params_land', 'right_records'])
-        s17 = lambda s: tm._try_get(s, ["right_record"])
-        right_holders = [tm._try_get(element, ['right_holders', 'right_holder']) for element in tm.iflist(right_records, s17)]
-
-        self.xml_value_table.append("".join(str(dict(right_holder))for right_holder in right_holders))
+        right_holders_name = [[i for i in j.itertext()][0] for j in root.findall('right_records/right_record/right_holders//value')]
+        self.xml_value_table.append("; \n".join(right_holders_name))
 
         # --- 18
-        record_info = [tm._try_get(element, ['record_info']) for element in tm.iflist(right_records, s17)]
-        self.xml_value_table.append(record_info)
-
-        tree = et.parse(self.filename)
-        root = tree.getroot()
-        # root.findall('right_records/right_record')[0]
-
         _type = [[i for i in j.itertext()][0] for j in
                  root.findall('right_records/right_record/right_data/right_type/value')]
-        index = [[i for i in j.itertext()][0] for j in
+        right_number = [[i for i in j.itertext()][0] for j in
                  root.findall('right_records/right_record/right_data/right_number')]
-        date = [[i for i in j.itertext()][0] for j in
+        date = [str(datetime.datetime.strptime([i for i in j.itertext()][0], "%Y-%m-%dT%H:%M:%S%z").date()) for j in
                 root.findall('right_records/right_record/record_info/registration_date')]
-
-        name = [[i for i in j.itertext()][0] for j in root.findall('right_records/right_record/right_holders//value')]
-
-        # index = [i for i in root.findall('right_records/right_record/right_data/right_number')[0].itertext()]
-
-        print(_type)
-        print(index)
-        print(name)
-        print(date)
-
-        # date = [i for i in root.findall('right_record/record_info')[0].itertext()][1]
-        # print([i for i in it[0].itertext()][1])
-        self.xml_value_table.append(
-            str(type)
-        )
+        self.xml_value_table.append("; \n".join([", ".join(el) for i, el in enumerate(zip(_type, right_number, date))]))
 
         # --- 19
-        self.xml_value_table.append("19")
+        ud = "; \n".join([", ".join([i for i in j.itertext()]) for j in
+                 root.findall('right_records/right_record/underlying_documents/underlying_document')])
+        if ud:
+            self.xml_value_table.append(ud)
+        else:
+            self.xml_value_table.append("-")
 
         # --- 20
-        rights = tm._try_get(self.xml_nested_dict, ['extract_base_params_land', 'restrict_records'])
-        self.xml_value_table.append(str(dict(rights)))
+        rr = "; \n\n".join([", ".join([str(i).strip() for i in j.itertext() if str(i).strip()]) for j in
+                        root.findall('restrict_records/restrict_record')])
+        # rights = tm._try_get(self.xml_nested_dict, ['extract_base_params_land', 'restrict_records'])
+        self.xml_value_table.append(rr)
         #
 
         # PHASE 2 - now, we have all The Data we need! Now it's time to find our data in Xml_table and push it
