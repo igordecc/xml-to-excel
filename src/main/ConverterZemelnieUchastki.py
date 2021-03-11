@@ -6,7 +6,7 @@ import xmltodict
 import pandas
 import traceback
 import datetime
-
+import xml.etree.ElementTree as et
 
 
 class PomeshhenijaRow:
@@ -99,8 +99,36 @@ class PomeshhenijaRow:
 
         # --- 18
         record_info = [tm._try_get(element, ['record_info']) for element in tm.iflist(right_records, s17)]
+        self.xml_value_table.append(record_info)
+
+        tree = et.parse(self.filename)
+        root = tree.getroot()
+        # root.findall('right_records/right_record')[0]
+
+        _type = [[i for i in j.itertext()][0] for j in
+                 root.findall('right_records/right_record/right_data/right_type/value')]
+        index = [[i for i in j.itertext()][0] for j in
+                 root.findall('right_records/right_record/right_data/right_number')]
+        date = [[i for i in j.itertext()][0] for j in
+                root.findall('right_records/right_record/record_info/registration_date')]
+
+        name = [[i for i in j.itertext()][0] for j in root.findall('right_records/right_record/right_holders//value')]
+
+        # index = [i for i in root.findall('right_records/right_record/right_data/right_number')[0].itertext()]
+
+        print(_type)
+        print(index)
+        print(name)
+        print(date)
+
+        # date = [i for i in root.findall('right_record/record_info')[0].itertext()][1]
+        # print([i for i in it[0].itertext()][1])
+        self.xml_value_table.append(
+            str(type)
+        )
 
         # --- 19
+        self.xml_value_table.append("19")
 
         # --- 20
         rights = tm._try_get(self.xml_nested_dict, ['extract_base_params_land', 'restrict_records'])
