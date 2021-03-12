@@ -119,7 +119,6 @@ class ONSRow:
                                        root.findall("cad_links/land_cad_numbers/land_cad_number/cad_number")])
         self.xml_value_table.append(land_cad_numbers)
 
-
         # 17
         anchor4 = len(self.xml_value_table)
         base_params = "params/base_parameters/base_parameter/"
@@ -133,6 +132,21 @@ class ONSRow:
         # 18
         right_holders_name = [[i for i in j.itertext()][0] for j in
                               root.findall('right_records/right_record/right_holders//value')]
+
+        def get_right_holder(root: root):
+            e = root.findall('right_records/right_record/right_holders/right_holder/*')
+
+            # for ..
+            print(e[0].tag)
+            if e[0].tag=="public_formation":
+                print()
+            elif e[0].tag=="individual":
+                ...
+            elif e[0].tag=="legal_entity":
+                ...
+            elif e[0].tag=="another":
+                ...
+
         self.xml_value_table.append("; \n".join(right_holders_name))
 
         # 19
