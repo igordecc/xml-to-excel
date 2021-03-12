@@ -5,6 +5,7 @@ import os, sys
 import xmltodict
 import pandas
 import traceback
+import xml.etree.ElementTree as et
 import datetime
 
 
@@ -23,6 +24,9 @@ class ONSRow:
             traceback.print_exc()
             return lambda x: None
 
+        tree = et.parse(self.filename)
+        root = tree.getroot()
+        root.findall("")
         # PHASE 1 - extract xml Data into xml Table! Keep track of to which excel_column The Data will go ;)
 
         self.xml_value_table = []
@@ -60,6 +64,86 @@ class ONSRow:
         for value_id, value in enumerate(simple_xml_values):
             self.xml_value_table.append(tm._try_get(self.xml_nested_dict, value))
 
+        # anchor1 - 4
+        anchor1 = len(self.xml_value_table)
+        _type = [[i for i in j.itertext()][0] for j in
+                 root.findall('object_under_construction_record/object/common_data/type/value')][0]
+        if _type=="object_under_construction_record":
+            self.xml_value_table.append("ОНС")
+        elif not _type:
+            self.xml_value_table.append("-")
+        else:
+            self.xml_value_table.append(_type)
+
+        # 5
+        cad_num = [[i for i in j.itertext()][0] for j in
+                 root.findall('object_under_construction_record/object/common_data/cad_number')][0]
+        self.xml_value_table.append(cad_num)
+
+        # 8
+        old_numbers = " , ".join([" ".join(([i for i in j.itertext()])) for j in
+                   root.findall("cad_links/old_numbers/old_number")])
+        self.xml_value_table.append(old_numbers)
+
+        # 10=12
+        anchor2 = len(self.xml_value_table)
+        base_params = "params/base_parameters/base_parameter/"
+        def get_param(param):
+            p = [[i for i in j.itertext()][0] for j in root.findall(f"{base_params}{param}")]
+            if p:
+                return p[0]
+            else:
+                return ""
+
+        area = "Площадь в кв. метрах " + get_param("area") + " ; \n"
+        built_up_area = "Площадь застройки в квадратных метрах с округлением до 0,1 квадратного метра " \
+                        + get_param("built_up_area") + " ; \n"
+        extension = "Протяженность в метрах с округлением до 1 метра " + get_param("extension") + " ; \n"
+        depth = "Глубина в метрах с округлением до 0,1 метра" + get_param("depth") + " ; \n"
+        occurence_depth = "Глубина залегания в метрах с округлением до 0,1 метра " + get_param(
+            "occurence_depth") + " ; \n"
+        volume = "Объем в кубических метрах с округлением до 1 кубического метра " + get_param("volume") + " ; \n"
+        height = "Высота в метрах с округлением до 0,1 метра " + get_param("height") + " ; \n"
+
+        self.xml_value_table.append("".join([area, built_up_area, extension, depth, occurence_depth, volume, height]))
+
+        # 11
+        degree_readiness = [[i for i in j.itertext()][0] for j in root.findall("params/degree_readiness")]
+        if degree_readiness:
+            degree_readiness = degree_readiness[0]
+        self.xml_value_table.append(str(degree_readiness))
+
+        # 15
+        anchor3 = len(self.xml_value_table)
+        land_cad_numbers = " , ".join([" ".join([i for i in j.itertext()]) for j in
+                                       root.findall("cad_links/land_cad_numbers/land_cad_number/cad_number")])
+        self.xml_value_table.append(land_cad_numbers)
+
+
+        # 17
+        anchor4 = len(self.xml_value_table)
+        base_params = "params/base_parameters/base_parameter/"
+        p = [[i for i in j.itertext()][0] for j in root.findall("object_under_construction_record/special_notes")]
+        if p:
+            p = p[0]
+        else:
+            p = ""
+        self.xml_value_table.append(p)
+
+        # 18
+        right_holders_name = [[i for i in j.itertext()][0] for j in
+                              root.findall('right_records/right_record/right_holders//value')]
+        self.xml_value_table.append("; \n".join(right_holders_name))
+
+        # 19
+        _type = [[i for i in j.itertext()][0] for j in
+                 root.findall('right_records/right_record/right_data/right_type/value')]
+        right_number = [[i for i in j.itertext()][0] for j in
+                 root.findall('right_records/right_record/right_data/right_number')]
+        date = [str(datetime.datetime.strptime([i for i in j.itertext()][0], "%Y-%m-%dT%H:%M:%S%z").date()) for j in
+                root.findall('right_records/right_record/record_info/registration_date')]
+        self.xml_value_table.append("; \n".join([", ".join(el) for i, el in enumerate(zip(_type, right_number, date))]))
+
         # PHASE 2 - now, we have all The Data we need! Now it's time to find our data in Xml_table and push it
         # to Excel_table.
         # Simple case:  we pushing one xml_value to one excel_column
@@ -78,6 +162,18 @@ class ONSRow:
         for i, excel_id in enumerate(simple_excel__column_destination):
             self.excel_table[excel_id - 1] = self.xml_value_table[i + ANCHOR0]
 
+        self.excel_table[4 - 1] = self.xml_value_table[anchor1]
+        self.excel_table[5 - 1] = self.xml_value_table[anchor1 + 1]
+        self.excel_table[8 - 1] = self.xml_value_table[anchor1 + 2]
+        self.excel_table[12 - 1] = self.xml_value_table[anchor2]    # 10=12
+        self.excel_table[11 - 1] = self.xml_value_table[anchor2 + 1]
+        self.excel_table[15 - 1] = self.xml_value_table[anchor3]
+        self.excel_table[17 - 1] = self.xml_value_table[anchor4]
+        self.excel_table[18 - 1] = self.xml_value_table[anchor4+1]
+        self.excel_table[19 - 1] = self.xml_value_table[anchor4+2]
+        # self.excel_table[4 - 1] = self.xml_value_table[i + anchor1]
+
+
         return self.excel_table
 
     def __getitem__(self, i):
@@ -85,11 +181,22 @@ class ONSRow:
 
 
 if __name__ == '__main__':
+    def excel_format(writer):
+        sheet_setting = writer.sheets["Sheet1"]
+        wrap_format = writer.book.add_format({'text_wrap': True})
+        wid = 20
+        sheet_setting.set_column(0, 22, width=wid, cell_format=wrap_format)
+        sheet_setting.set_column(8, 8, width=wid*4, cell_format=wrap_format)
+        sheet_setting.set_column(16, 22, width=wid*4, cell_format=wrap_format)
+        sheet_setting.set_column(9, 9, width=wid * 2, cell_format=wrap_format)
+        sheet_setting.set_column(11, 11, width=wid * 2, cell_format=wrap_format)
+        return writer
     config = {
         "xml": "D:\\PYTHON\\xml-to-excel\\src\\main\\resources\\ОНС",
         # "xml": "D:\\PYTHON\\xml-to-excel\\src\\main\\resources\\сооружения\\xml_сооружения_29.12.2020",
         "excel": "D:\\PYTHON\\xml-to-excel\\",
         "excel_filename": "ONS.xlsx",
+        "excel_format": excel_format,
         "caps": [
             'Наименование файла',#1
             'Номер выписки',#2

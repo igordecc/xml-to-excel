@@ -77,6 +77,7 @@ class XmlConverterFabric:
             list_of_rows.append(i)
 
         df = pandas.DataFrame(list_of_rows, columns = self.config["caps"])
+
         writer = pandas.ExcelWriter(os.path.join(self.config["excel"], self.config["excel_filename"]))
         df.to_excel(writer, index=False)
         if self.config.get("excel_format"):

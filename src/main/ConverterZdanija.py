@@ -82,11 +82,21 @@ class ZdanijaRow:
 
 
 if __name__ == '__main__':
+    def excel_format(writer):
+        sheet_setting = writer.sheets["Sheet1"]
+        wrap_format = writer.book.add_format({'text_wrap': True})
+        wid = 20
+        sheet_setting.set_column(0, 7, width=wid, cell_format=wrap_format)
+        sheet_setting.set_column(8, 8, width=wid * 3, cell_format=wrap_format)
+        sheet_setting.set_column(9, 17, width=wid, cell_format=wrap_format)
+        sheet_setting.set_column(18, 26, width=wid * 4, cell_format=wrap_format)
+        return writer
     config = {
         # TODO GET RIGHT XMLS!!!!!!!!!!
         "xml": "D:\\PYTHON\\xml-to-excel\\src\\main\\resources\\здания\\xml_здания_Выписки_ч3", # левые выписки, найти нужные
         "excel": "D:\\PYTHON\\xml-to-excel\\",
         "excel_filename": "Zdanija.xlsx",
+        "excel_format": excel_format,
         "caps": [
             'Наименование файла',  # 1
             'Номер выписки',  # 2

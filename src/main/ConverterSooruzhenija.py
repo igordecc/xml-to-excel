@@ -78,12 +78,14 @@ class PomeshhenijaRow:
         old_numbers = tm._try_get(self.xml_nested_dict,
                                   ['extract_base_params_construction', 'construction_record',
                                                          'cad_links', 'old_numbers', "old_number"])
-        s8 = lambda s: "".join([str(tm._try_get(s, ["number_type", "value"])),
-                                " ",
+        s8 = lambda s: " ; ".join([str(tm._try_get(s, ["number_type", "value"])),
                                 str(tm._try_get(s, ["number", ])),
-                                " ; "
                                 ])
-        self.xml_value_table.append("".join([str(i) for i in tm.iflist(old_numbers, s8)]))
+        old_gos_num = " ;; \n".join([str(i) for i in tm.iflist(old_numbers, s8)])
+        if old_gos_num:
+            self.xml_value_table.append(old_gos_num)
+        else:
+            self.xml_value_table.append("-")
 
         # --- 23
         anchor4 = len(self.xml_value_table)
@@ -179,10 +181,24 @@ class PomeshhenijaRow:
 
 
 if __name__ == '__main__':
+    def excel_format(writer):
+        sheet_setting = writer.sheets["Sheet1"]
+        wrap_format = writer.book.add_format({'text_wrap': True})
+        wid = 20
+        sheet_setting.set_column(0, 6, width=wid, cell_format=wrap_format)
+        sheet_setting.set_column(7, 8, width=wid * 3, cell_format=wrap_format)
+        sheet_setting.set_column(9, 15, width=wid // 2, cell_format=wrap_format)
+        sheet_setting.set_column(16, 17, width=wid * 3, cell_format=wrap_format)
+        sheet_setting.set_column(18, 21, width=wid, cell_format=wrap_format)
+        sheet_setting.set_column(22, 23, width=wid * 2, cell_format=wrap_format)
+        sheet_setting.set_column(24, 26, width=wid * 4, cell_format=wrap_format)
+        sheet_setting.set_column(27, 29, width=wid * 12, cell_format=wrap_format)
+        return writer
     config = {
         "xml": "D:\\PYTHON\\xml-to-excel\\src\\main\\resources\\сооружения\\xml_сооружения",
         "excel": "D:\\PYTHON\\xml-to-excel\\",
         "excel_filename": "Sooruzhenija.xlsx",
+        "excel_format": excel_format,
         "caps": [
             'Наименование файла', # 1
             'Номер выписки', # 2
