@@ -6,6 +6,7 @@ import xmltodict
 import pandas
 import traceback
 import datetime
+import xml.etree.ElementTree as et
 
 
 class PomeshhenijaRow:
@@ -22,6 +23,12 @@ class PomeshhenijaRow:
             print(f"код {sys.exc_info()[0].__dict__}")
             traceback.print_exc()
             return lambda x: None
+
+        # PHASE 0 - parse etree. enjoy XPath!
+
+        tree = et.parse(self.filename)
+        root = tree.getroot()
+        root.findall("")
 
         # PHASE 1 - extract xml Data into xml Table! Keep track of to which excel_column The Data will go ;)
 
@@ -55,6 +62,67 @@ class PomeshhenijaRow:
         for value_id, value in enumerate(simple_xml_values):
             self.xml_value_table.append(tm._try_get(self.xml_nested_dict, value))
 
+        # --- 4 == 6
+        anchor1 = len(self.xml_value_table)
+        self.xml_value_table.append(tm._try_get(self.xml_nested_dict, ['extract_base_params_room', 'room_record',
+                                                                       'object', 'common_data', 'type', 'value']))
+
+        # --- 5 == 7
+        anchor2 = len(self.xml_value_table)
+        dt = tm._try_get(self.xml_nested_dict, ['extract_base_params_room',
+                                                'room_record', 'record_info', 'registration_date'])
+        if dt:
+            dt = datetime.datetime.strptime(dt, "%Y-%m-%dT%H:%M:%S%z").date()
+        self.xml_value_table.append(dt)
+
+        # --- 8 +
+        anchor3 = len(self.xml_value_table)
+        old_numbers = "; \n\n".join([", ".join([str(i).strip() for i in j.itertext() if str(i).strip()]) for j in
+                                     root.findall('cad_links/old_numbers')])
+        if old_numbers:
+            self.xml_value_table.append(old_numbers)
+        else:
+            self.xml_value_table.append("-")
+
+        # --- 12 == 23
+        anchor4 = len(self.xml_value_table)
+        land_cad_numbers = tm._try_get(self.xml_nested_dict,
+                                       ['extract_base_params_room', 'room_record', 'cad_links', 'included_objects',
+                                        'included_object']
+                                       )
+        s12 = lambda s: "".join([str(tm._try_get(s, ["cad_number"])), " ; "])
+        self.xml_value_table.append("".join([str(i) for i in tm.iflist(land_cad_numbers, s12)]))
+
+        # TODO remake into more objects
+        # --- 17 == 28
+        anchor5 = len(self.xml_value_table)
+        right_holders_name = [[i for i in j.itertext()][0] for j in
+                              root.findall('right_records/right_record/right_holders//value')]
+        self.xml_value_table.append("; \n".join(right_holders_name))
+
+        # --- 18
+        _type = [[i for i in j.itertext()][0] for j in
+                 root.findall('right_records/right_record/right_data/right_type/value')]
+        right_number = [[i for i in j.itertext()][0] for j in
+                        root.findall('right_records/right_record/right_data/right_number')]
+        date = [str(datetime.datetime.strptime([i for i in j.itertext()][0], "%Y-%m-%dT%H:%M:%S%z").date()) for j in
+                root.findall('right_records/right_record/record_info/registration_date')]
+        self.xml_value_table.append("; \n".join([", ".join(el) for i, el in enumerate(zip(_type, right_number, date))]))
+
+        # --- 19
+        ud = "; \n".join([", ".join([i for i in j.itertext()]) for j in
+                          root.findall('right_records/right_record/underlying_documents/underlying_document')])
+        if ud:
+            self.xml_value_table.append(ud)
+        else:
+            self.xml_value_table.append("-")
+
+        # --- 20
+        rr = "; \n\n".join([", ".join([str(i).strip() for i in j.itertext() if str(i).strip()]) for j in
+                            root.findall('restrict_records/restrict_record')])
+        # rights = tm._try_get(self.xml_nested_dict, ['extract_base_params_room', 'restrict_records'])
+        self.xml_value_table.append(rr)
+
         # PHASE 2 - now, we have all The Data we need! Now it's time to find our data in Xml_table and push it
         # to Excel_table.
         # Simple case:  we pushing one xml_value to one excel_column
@@ -73,6 +141,20 @@ class PomeshhenijaRow:
         for i, excel_id in enumerate(simple_excel__column_destination):
             self.excel_table[excel_id - 1] = self.xml_value_table[i + ANCHOR0]
 
+        # anchor1 - field #4
+        if self.xml_value_table[anchor1] == "room_record":
+            self.excel_table[4 - 1] = "Помещение"
+        else:
+            self.excel_table[4 - 1] = self.xml_value_table[anchor1]
+
+        # anchor2 - field #5
+        self.excel_table[5 - 1] = self.xml_value_table[anchor2]
+
+        # anchor3 - field #8
+        self.excel_table[8 - 1] = self.xml_value_table[anchor3]
+
+        # TODO compare with ConverterZemelnieUchastki here and further
+
         return self.excel_table
 
     def __getitem__(self, i):
@@ -87,7 +169,7 @@ if __name__ == '__main__':
         sheet_setting.set_column(0, 7, width=wid, cell_format=wrap_format)
         sheet_setting.set_column(8, 8, width=wid * 3, cell_format=wrap_format)
         sheet_setting.set_column(9, 15, width=wid, cell_format=wrap_format)
-        sheet_setting.set_column(16, 26, width=wid * 4, cell_format=wrap_format)
+        sheet_setting.set_column(16, 25, width=wid * 4, cell_format=wrap_format)
         return writer
     config = {
         "xml": "D:\\PYTHON\\xml-to-excel\\src\\main\\resources\\помещения",
