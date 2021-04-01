@@ -184,19 +184,10 @@ class PomeshhenijaRow:
         return self.excel_table[i]
 
 
-if __name__ == '__main__':
-    def excel_format(writer):
-        sheet_setting = writer.sheets["Sheet1"]
-        wrap_format = writer.book.add_format({'text_wrap': True})
-        wid = 20
-        sheet_setting.set_column(0, 7, width=wid, cell_format=wrap_format)
-        sheet_setting.set_column(8, 8, width=wid * 3, cell_format=wrap_format)
-        sheet_setting.set_column(9, 15, width=wid, cell_format=wrap_format)
-        sheet_setting.set_column(16, 25, width=wid * 4, cell_format=wrap_format)
-        return writer
-    config = {
-        "xml": "D:\\PYTHON\\xml-to-excel\\src\\main\\resources\\помещения",
-        "excel": "D:\\PYTHON\\xml-to-excel\\",
+def config(input_dir, output_dir):
+    return {
+        "xml": input_dir,
+        "excel": output_dir,
         "excel_filename": "Pomeshhenija.xlsx",
         "excel_format": excel_format,
         "caps": [
@@ -232,6 +223,23 @@ if __name__ == '__main__':
             # 26
         ],
     }
-    converter = XmlConverterFabric(config, PomeshhenijaRow)
+
+
+def excel_format(writer):
+    sheet_setting = writer.sheets["Sheet1"]
+    wrap_format = writer.book.add_format({'text_wrap': True})
+    wid = 20
+    sheet_setting.set_column(0, 7, width=wid, cell_format=wrap_format)
+    sheet_setting.set_column(8, 8, width=wid * 3, cell_format=wrap_format)
+    sheet_setting.set_column(9, 15, width=wid, cell_format=wrap_format)
+    sheet_setting.set_column(16, 25, width=wid * 4, cell_format=wrap_format)
+    return writer
+
+
+def run(input_dir, output_dir):
+    converter = XmlConverterFabric(config(input_dir, output_dir), PomeshhenijaRow)
     converter.run()
 
+
+if __name__ == '__main__':
+    run("D:\\PYTHON\\xml-to-excel\\src\\main\\resources\\помещения", "D:\\PYTHON\\xml-to-excel\\")

@@ -167,57 +167,65 @@ class PomeshhenijaRow:
         return self.excel_table[i]
 
 
-if __name__ == '__main__':
-    def excel_format(writer):
-        sheet_setting = writer.sheets["Sheet1"]
-        wrap_format = writer.book.add_format({'text_wrap': True})
-        wid = 20
-        sheet_setting.set_column(0, 6, width=wid, cell_format=wrap_format)
-        sheet_setting.set_column(7, 8, width=wid * 3, cell_format=wrap_format)
-        sheet_setting.set_column(9, 15, width=wid // 2, cell_format=wrap_format)
-        sheet_setting.set_column(16, 17, width=wid * 3, cell_format=wrap_format)
-        sheet_setting.set_column(18, 21, width=wid, cell_format=wrap_format)
-        sheet_setting.set_column(22, 23, width=wid * 2, cell_format=wrap_format)
-        sheet_setting.set_column(24, 26, width=wid * 4, cell_format=wrap_format)
-        sheet_setting.set_column(27, 29, width=wid * 12, cell_format=wrap_format)
-        return writer
-    config = {
-        "xml": "D:\\PYTHON\\xml-to-excel\\src\\main\\resources\\сооружения\\xml_сооружения",
-        "excel": "D:\\PYTHON\\xml-to-excel\\",
-        "excel_filename": "Sooruzhenija.xlsx",
-        "excel_format": excel_format,
-        "caps": [
-            'Наименование файла', # 1
-            'Номер выписки', # 2
-            'Дата выписки', # 3
-            'Кадастровый номер', # 4
-            'Кадастровый квартал', # 5
-            'Вид объекта недвижимости', # 6
-            'Дата присвоения кадастрового номера', # 7
-            'Ранее присвоенный государственный учетный номер', # 8
-            'Адрес', # 9
-            'Основная характеристика сооружения # Площадь в кв.метрах', # 10
-            'Основная характеристика сооружения # Площадь застройки в квадратных метрах с округлением до 0,1 квадратного метра ', # 11
-            'Основная характеристика сооружения # Протяженность в метрах с округлением до 1 метра', # 12
-            'Основная характеристика сооружения # Глубина в метрах с округлением до 0,1 метра', # 13
-            'Основная характеристика сооружения # Глубина залегания в метрах с округлением до 0,1 метра', # 14
-            'Основная характеристика сооружения # Объем в кубических метрах с округлением до 1 кубического метра', # 15
-            'Основная характеристика сооружения # Высота в метрах с округлением до 0,1 метра', # 16
-            'Наименование', # 17
-            'Назначение сооружения', # 18
-            'Количество этажей, в том числе подземных этажей', # 19
-            'Год ввода в эксплуатацию по завершении строительства', # 20
-            'Год завершения строительства', # 21
-            'Кадастровая стоимость', # 22
-            'Кадастровые номера иных объектов недвижимости, в пределах которых расположен объект недвижимости', # 23
-            'Кадастровые номера помещений, машино-мест, расположенных в здании или сооружении', # 24
-            'Виды разрешенного использования',# 25
-            'Статус записи об объекте недвижимости',# 26
-            'Особые отметки', # 27
-            'Сведения о праве и правообладателях', # 28
-            'Сведения о праве (бесхозяйное имущество)', # 29
-        ],
-    }
-    converter = XmlConverterFabric(config, PomeshhenijaRow)
+def config(input_dir, output_dir):
+    return {
+    "xml": input_dir,
+    "excel": output_dir,
+    "excel_filename": "Sooruzhenija.xlsx",
+    "excel_format": excel_format,
+    "caps": [
+        'Наименование файла', # 1
+        'Номер выписки', # 2
+        'Дата выписки', # 3
+        'Кадастровый номер', # 4
+        'Кадастровый квартал', # 5
+        'Вид объекта недвижимости', # 6
+        'Дата присвоения кадастрового номера', # 7
+        'Ранее присвоенный государственный учетный номер', # 8
+        'Адрес', # 9
+        'Основная характеристика сооружения # Площадь в кв.метрах', # 10
+        'Основная характеристика сооружения # Площадь застройки в квадратных метрах с округлением до 0,1 квадратного метра ', # 11
+        'Основная характеристика сооружения # Протяженность в метрах с округлением до 1 метра', # 12
+        'Основная характеристика сооружения # Глубина в метрах с округлением до 0,1 метра', # 13
+        'Основная характеристика сооружения # Глубина залегания в метрах с округлением до 0,1 метра', # 14
+        'Основная характеристика сооружения # Объем в кубических метрах с округлением до 1 кубического метра', # 15
+        'Основная характеристика сооружения # Высота в метрах с округлением до 0,1 метра', # 16
+        'Наименование', # 17
+        'Назначение сооружения', # 18
+        'Количество этажей, в том числе подземных этажей', # 19
+        'Год ввода в эксплуатацию по завершении строительства', # 20
+        'Год завершения строительства', # 21
+        'Кадастровая стоимость', # 22
+        'Кадастровые номера иных объектов недвижимости, в пределах которых расположен объект недвижимости', # 23
+        'Кадастровые номера помещений, машино-мест, расположенных в здании или сооружении', # 24
+        'Виды разрешенного использования',# 25
+        'Статус записи об объекте недвижимости',# 26
+        'Особые отметки', # 27
+        'Сведения о праве и правообладателях', # 28
+        'Сведения о праве (бесхозяйное имущество)', # 29
+    ],
+}
+
+
+def excel_format(writer):
+    sheet_setting = writer.sheets["Sheet1"]
+    wrap_format = writer.book.add_format({'text_wrap': True})
+    wid = 20
+    sheet_setting.set_column(0, 6, width=wid, cell_format=wrap_format)
+    sheet_setting.set_column(7, 8, width=wid * 3, cell_format=wrap_format)
+    sheet_setting.set_column(9, 15, width=wid // 2, cell_format=wrap_format)
+    sheet_setting.set_column(16, 17, width=wid * 3, cell_format=wrap_format)
+    sheet_setting.set_column(18, 21, width=wid, cell_format=wrap_format)
+    sheet_setting.set_column(22, 23, width=wid * 2, cell_format=wrap_format)
+    sheet_setting.set_column(24, 26, width=wid * 4, cell_format=wrap_format)
+    sheet_setting.set_column(27, 29, width=wid * 12, cell_format=wrap_format)
+    return writer
+
+
+def run(input_dir, output_dir):
+    converter = XmlConverterFabric(config(input_dir, output_dir), PomeshhenijaRow)
     converter.run()
 
+
+if __name__ == '__main__':
+    run("D:\\PYTHON\\xml-to-excel\\src\\main\\resources\\сооружения\\xml_сооружения", "D:\\PYTHON\\xml-to-excel\\")

@@ -157,23 +157,25 @@ class PomeshhenijaRow:
         return self.excel_table[i]
 
 
-if __name__ == '__main__':
-    def excel_format(writer):
-        sheet_setting = writer.sheets["Sheet1"]
-        wrap_format = writer.book.add_format({'text_wrap': True})
-        wid = 20
-        sheet_setting.set_column(0, 7, width=wid, cell_format=wrap_format)
-        sheet_setting.set_column(8, 8, width=wid * 3, cell_format=wrap_format)
-        sheet_setting.set_column(9, 10, width=wid * 3, cell_format=wrap_format)
-        sheet_setting.set_column(11, 12, width=wid * 6, cell_format=wrap_format)
-        sheet_setting.set_column(13, 14, width=wid, cell_format=wrap_format)
-        sheet_setting.set_column(15, 15, width=wid * 6, cell_format=wrap_format)
-        sheet_setting.set_column(16, 17, width=wid * 3, cell_format=wrap_format)
-        sheet_setting.set_column(18, 19, width=wid * 12, cell_format=wrap_format)
-        return writer
-    config = {
-        "xml": "D:\\PYTHON\\xml-to-excel\\src\\main\\resources\\земельные_участки",
-        "excel": "D:\\PYTHON\\xml-to-excel\\",
+def excel_format(writer):
+    sheet_setting = writer.sheets["Sheet1"]
+    wrap_format = writer.book.add_format({'text_wrap': True})
+    wid = 20
+    sheet_setting.set_column(0, 7, width=wid, cell_format=wrap_format)
+    sheet_setting.set_column(8, 8, width=wid * 3, cell_format=wrap_format)
+    sheet_setting.set_column(9, 10, width=wid * 3, cell_format=wrap_format)
+    sheet_setting.set_column(11, 12, width=wid * 6, cell_format=wrap_format)
+    sheet_setting.set_column(13, 14, width=wid, cell_format=wrap_format)
+    sheet_setting.set_column(15, 15, width=wid * 6, cell_format=wrap_format)
+    sheet_setting.set_column(16, 17, width=wid * 3, cell_format=wrap_format)
+    sheet_setting.set_column(18, 19, width=wid * 12, cell_format=wrap_format)
+    return writer
+
+
+def config(input_dir, output_dir):
+    return {
+        "xml": input_dir,
+        "excel": output_dir,
         "excel_filename": "ZU.xlsx",
         "excel_format" : excel_format,
         "caps": [
@@ -199,6 +201,12 @@ if __name__ == '__main__':
             'Ограничение прав и обременение объекта недвижимости',#20
         ],
     }
-    converter = XmlConverterFabric(config, PomeshhenijaRow)
+
+
+def run(input_dir, output_dir):
+    converter = XmlConverterFabric(config(input_dir, output_dir), PomeshhenijaRow)
     converter.run()
 
+
+if __name__ == '__main__':
+    run("D:\\PYTHON\\xml-to-excel\\src\\main\\resources\\земельные_участки", "D:\\PYTHON\\xml-to-excel\\")

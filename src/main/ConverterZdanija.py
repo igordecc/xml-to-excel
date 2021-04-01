@@ -164,7 +164,7 @@ class ZdanijaRow:
             self.excel_table[4 - 1] = "Здание"
         else:
             self.excel_table[4 - 1] = self.xml_value_table[anchor1]
-            
+
         self.excel_table[5 - 1] = self.xml_value_table[anchor2]
         self.excel_table[8 - 1] = self.xml_value_table[anchor3]
         self.excel_table[17 - 1] = self.xml_value_table[anchor4]
@@ -181,20 +181,21 @@ class ZdanijaRow:
         return self.excel_table[i]
 
 
-if __name__ == '__main__':
-    def excel_format(writer):
-        sheet_setting = writer.sheets["Sheet1"]
-        wrap_format = writer.book.add_format({'text_wrap': True})
-        wid = 20
-        sheet_setting.set_column(0, 7, width=wid, cell_format=wrap_format)
-        sheet_setting.set_column(8, 8, width=wid * 3, cell_format=wrap_format)
-        sheet_setting.set_column(9, 17, width=wid, cell_format=wrap_format)
-        sheet_setting.set_column(18, 26, width=wid * 4, cell_format=wrap_format)
-        return writer
-    config = {
-        # TODO GET RIGHT XMLS!!!!!!!!!!
-        "xml": "D:\\PYTHON\\xml-to-excel\\src\\main\\resources\\здания\\xml_здания_Выписки_ч3", # левые выписки, найти нужные
-        "excel": "D:\\PYTHON\\xml-to-excel\\",
+def excel_format(writer):
+    sheet_setting = writer.sheets["Sheet1"]
+    wrap_format = writer.book.add_format({'text_wrap': True})
+    wid = 20
+    sheet_setting.set_column(0, 7, width=wid, cell_format=wrap_format)
+    sheet_setting.set_column(8, 8, width=wid * 3, cell_format=wrap_format)
+    sheet_setting.set_column(9, 17, width=wid, cell_format=wrap_format)
+    sheet_setting.set_column(18, 26, width=wid * 4, cell_format=wrap_format)
+    return writer
+
+
+def config(input_dir, output_dir):
+    return {
+        "xml": input_dir,
+        "excel": output_dir,
         "excel_filename": "Zdanija.xlsx",
         "excel_format": excel_format,
         "caps": [
@@ -228,6 +229,12 @@ if __name__ == '__main__':
             # 27
         ],
     }
-    converter = XmlConverterFabric(config, ZdanijaRow)
+
+
+def run(input_dir, output_dir):
+    converter = XmlConverterFabric(config(input_dir, output_dir), ZdanijaRow)
     converter.run()
 
+
+if __name__ == '__main__':
+    run("D:\\PYTHON\\xml-to-excel\\src\\main\\resources\\здания\\xml_здания_Выписки_ч3", "D:\\PYTHON\\xml-to-excel\\")

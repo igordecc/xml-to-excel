@@ -83,6 +83,7 @@ class XmlConverterFabric:
         if self.config.get("excel_format"):
             writer = self.config["excel_format"](writer)
         writer.save()
+        print("Сохранено!")
 
 
 if __name__ == '__main__':

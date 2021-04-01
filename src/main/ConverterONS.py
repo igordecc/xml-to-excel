@@ -238,21 +238,22 @@ class ONSRow:
         return self.excel_table[i]
 
 
-if __name__ == '__main__':
-    def excel_format(writer):
-        sheet_setting = writer.sheets["Sheet1"]
-        wrap_format = writer.book.add_format({'text_wrap': True})
-        wid = 20
-        sheet_setting.set_column(0, 22, width=wid, cell_format=wrap_format)
-        sheet_setting.set_column(8, 8, width=wid*4, cell_format=wrap_format)
-        sheet_setting.set_column(16, 22, width=wid*4, cell_format=wrap_format)
-        sheet_setting.set_column(9, 9, width=wid * 2, cell_format=wrap_format)
-        sheet_setting.set_column(11, 11, width=wid * 2, cell_format=wrap_format)
-        return writer
-    config = {
-        "xml": "D:\\PYTHON\\xml-to-excel\\src\\main\\resources\\ОНС",
-        # "xml": "D:\\PYTHON\\xml-to-excel\\src\\main\\resources\\сооружения\\xml_сооружения_29.12.2020",
-        "excel": "D:\\PYTHON\\xml-to-excel\\",
+def excel_format(writer):
+    sheet_setting = writer.sheets["Sheet1"]
+    wrap_format = writer.book.add_format({'text_wrap': True})
+    wid = 20
+    sheet_setting.set_column(0, 22, width=wid, cell_format=wrap_format)
+    sheet_setting.set_column(8, 8, width=wid*4, cell_format=wrap_format)
+    sheet_setting.set_column(16, 22, width=wid*4, cell_format=wrap_format)
+    sheet_setting.set_column(9, 9, width=wid * 2, cell_format=wrap_format)
+    sheet_setting.set_column(11, 11, width=wid * 2, cell_format=wrap_format)
+    return writer
+
+
+def config(input_dir, output_dir):
+    return {
+        "xml": input_dir,
+        "excel": output_dir,
         "excel_filename": "ONS.xlsx",
         "excel_format": excel_format,
         "caps": [
@@ -281,6 +282,13 @@ if __name__ == '__main__':
             'Сведения об осуществлении государственной регистрации прав без необходимого в силу закона согласия третьего лица, органа',#23
         ]
     }
-    converter = XmlConverterFabric(config, ONSRow)
+
+
+def run(input_dir, output_dir):
+    converter = XmlConverterFabric(config(input_dir, output_dir), ONSRow)
     converter.run()
 
+
+if __name__ == '__main__':
+    # "xml": "D:\\PYTHON\\xml-to-excel\\src\\main\\resources\\сооружения\\xml_сооружения_29.12.2020",
+    run("D:\\PYTHON\\xml-to-excel\\src\\main\\resources\\ОНС", "D:\\PYTHON\\xml-to-excel\\")
