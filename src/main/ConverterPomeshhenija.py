@@ -54,6 +54,7 @@ class PomeshhenijaRow:
             ['extract_base_params_room', 'room_record', 'params', 'type', 'value'],
             ['extract_base_params_room', 'room_record', 'cost', 'value'],
 
+            ['extract_base_params_room', 'room_record', 'params', 'permitted_uses', 'permitted_use', 'value'],
             ['extract_base_params_room', 'room_record', 'params', 'special_type', 'value'],
             ['extract_base_params_room', 'status'],
             ['extract_base_params_room', 'room_record', 'special_notes'],
@@ -84,7 +85,7 @@ class PomeshhenijaRow:
         else:
             self.xml_value_table.append("-")
 
-        # --- 12 == 23
+        # --- 16
         anchor4 = len(self.xml_value_table)
         land_cad_numbers = tm._try_get(self.xml_nested_dict,
                                        ['extract_base_params_room', 'room_record', 'cad_links', 'included_objects',
@@ -93,14 +94,13 @@ class PomeshhenijaRow:
         s12 = lambda s: "".join([str(tm._try_get(s, ["cad_number"])), " ; "])
         self.xml_value_table.append("".join([str(i) for i in tm.iflist(land_cad_numbers, s12)]))
 
-        # TODO remake into more objects
-        # --- 17 == 28
+        # --- 21
         anchor5 = len(self.xml_value_table)
         right_holders_name = [[i for i in j.itertext()][0] for j in
                               root.findall('right_records/right_record/right_holders//value')]
         self.xml_value_table.append("; \n".join(right_holders_name))
 
-        # --- 18
+        # --- 22
         _type = [[i for i in j.itertext()][0] for j in
                  root.findall('right_records/right_record/right_data/right_type/value')]
         right_number = [[i for i in j.itertext()][0] for j in
@@ -109,7 +109,7 @@ class PomeshhenijaRow:
                 root.findall('right_records/right_record/record_info/registration_date')]
         self.xml_value_table.append("; \n".join([", ".join(el) for i, el in enumerate(zip(_type, right_number, date))]))
 
-        # --- 19
+        # --- 23
         ud = "; \n".join([", ".join([i for i in j.itertext()]) for j in
                           root.findall('right_records/right_record/underlying_documents/underlying_document')])
         if ud:
@@ -117,11 +117,32 @@ class PomeshhenijaRow:
         else:
             self.xml_value_table.append("-")
 
-        # --- 20
+        # --- 24
         rr = "; \n\n".join([", ".join([str(i).strip() for i in j.itertext() if str(i).strip()]) for j in
                             root.findall('restrict_records/restrict_record')])
         # rights = tm._try_get(self.xml_nested_dict, ['extract_base_params_room', 'restrict_records'])
-        self.xml_value_table.append(rr)
+        if rr!="":
+            self.xml_value_table.append(rr)
+        else:
+            self.xml_value_table.append("-")
+
+        # --- 25
+        _expropriation_info_type = [[i for i in j.itertext()][0] for j in
+                 root.findall('expropriation_info/expropriation_info_type')]
+        _origin_content = [[i for i in j.itertext()][0] for j in
+                        root.findall('expropriation_info/origin_content')]
+
+        self.xml_value_table.append("; \n".join([", ".join(el) for i, el in enumerate(zip(_expropriation_info_type,
+                                                                                          _origin_content))]))
+
+        # --- 26
+        rr = "; \n\n".join([", ".join([str(i).strip() for i in j.itertext() if str(i).strip()]) for j in
+                            root.findall('extract_base_params_room/deal_records/deal_record')])
+        # rights = tm._try_get(self.xml_nested_dict, ['extract_base_params_room', 'restrict_records'])
+        if rr != "":
+            self.xml_value_table.append(rr)
+        else:
+            self.xml_value_table.append("-")
 
         # PHASE 2 - now, we have all The Data we need! Now it's time to find our data in Xml_table and push it
         # to Excel_table.
@@ -137,7 +158,7 @@ class PomeshhenijaRow:
         self.excel_table[0] = os.path.split(self.filename)[-1]
 
         # simple excel fields
-        simple_excel__column_destination = [2, 3,   5, 6, 7,   9, 10, 11, 12, 13, 14, 15,   18, 19, 20]
+        simple_excel__column_destination = [2, 3,   5, 6, 7,   9, 10, 11, 12, 13, 14, 15,   17, 18, 19, 20]
         for i, excel_id in enumerate(simple_excel__column_destination):
             self.excel_table[excel_id - 1] = self.xml_value_table[i + ANCHOR0]
 
@@ -153,7 +174,26 @@ class PomeshhenijaRow:
         # anchor3 - field #8
         self.excel_table[8 - 1] = self.xml_value_table[anchor3]
 
-        # TODO compare with ConverterZemelnieUchastki here and further
+        # anchor4 - field #16
+        self.excel_table[16 - 1] = self.xml_value_table[anchor4]
+
+        # anchor5 - field #21
+        self.excel_table[21 - 1] = self.xml_value_table[anchor5]
+
+        # anchor5 - field #22
+        self.excel_table[22 - 1] = self.xml_value_table[anchor5 + 1]
+
+        # anchor5 - field #23
+        self.excel_table[23 - 1] = self.xml_value_table[anchor5 + 2]
+
+        # anchor5 - field #24
+        self.excel_table[24 - 1] = self.xml_value_table[anchor5 + 3]
+
+        # anchor5 - field #25
+        self.excel_table[25 - 1] = self.xml_value_table[anchor5 + 4]
+
+        # anchor5 - field #25
+        self.excel_table[26 - 1] = self.xml_value_table[anchor5 + 5]
 
         return self.excel_table
 
