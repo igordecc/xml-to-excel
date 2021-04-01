@@ -6,6 +6,7 @@ import xmltodict
 import pandas
 import traceback
 import datetime
+import xml.etree.ElementTree as et
 
 
 class PomeshhenijaRow:
@@ -23,6 +24,12 @@ class PomeshhenijaRow:
             traceback.print_exc()
             return lambda x: None
 
+        # PHASE 0 - parse etree. enjoy XPath!
+
+        tree = et.parse(self.filename)
+        root = tree.getroot()
+        root.findall("")
+
         # PHASE 1 - extract xml Data into xml Table! Keep track of to which excel_column The Data will go ;)
 
         self.xml_value_table = []
@@ -32,28 +39,110 @@ class PomeshhenijaRow:
         # then I'm appending excel iteratively ( but just for #THIS_CASE)
         # to better find my special place, I will mark this place with ANCHOR!
         simple_xml_values = [
-            ['extract_base_params_car_parking_space', 'details_statement', 'group_top_requisites', 'registration_number'],
-            ['extract_base_params_car_parking_space', 'details_statement', 'group_top_requisites', 'date_formation'],
+            ['extract_base_params_under_construction', 'details_statement', 'group_top_requisites', 'registration_number'],
+            ['extract_base_params_under_construction', 'details_statement', 'group_top_requisites', 'date_formation'],
 
-            ['extract_base_params_car_parking_space', 'car_parking_space_record', 'record_info', 'registration_date'],
-            ['extract_base_params_car_parking_space', 'car_parking_space_record', 'object', 'common_data', 'cad_number'],
-            ['extract_base_params_car_parking_space', 'car_parking_space_record', 'object', 'common_data', 'quarter_cad_number'],
+            ['extract_base_params_under_construction', 'object_under_construction_record', 'record_info', 'registration_date'],
+            ['extract_base_params_under_construction', 'object_under_construction_record', 'object', 'common_data', 'cad_number'],
+            ['extract_base_params_under_construction', 'object_under_construction_record', 'object', 'common_data', 'quarter_cad_number'],
 
-            ['extract_base_params_car_parking_space', 'car_parking_space_record', 'address_room', 'address', 'address', 'readable_address'],
-            ['extract_base_params_car_parking_space', 'car_parking_space_record', 'params', 'area'],
-            ['extract_base_params_car_parking_space', 'car_parking_space_record', 'params', 'purpose', 'value'],
-            ['extract_base_params_car_parking_space', 'car_parking_space_record', 'params', 'name'],
-            ['extract_base_params_car_parking_space', 'car_parking_space_record', 'location_in_build', 'level', 'floor'],
-            ['extract_base_params_car_parking_space', 'car_parking_space_record', 'params', 'type', 'value'],
-            ['extract_base_params_car_parking_space', 'car_parking_space_record', 'cost', 'value'],
+            ['extract_base_params_under_construction', 'object_under_construction_record', 'address_room', 'address', 'address', 'readable_address'],
+            ['extract_base_params_under_construction', 'object_under_construction_record', 'params', 'area'],
+            ['extract_base_params_under_construction', 'object_under_construction_record', 'params', 'purpose', 'value'],
+            ['extract_base_params_under_construction', 'object_under_construction_record', 'params', 'name'],
+            ['extract_base_params_under_construction', 'object_under_construction_record', 'location_in_build', 'level', 'floor'],
+            ['extract_base_params_under_construction', 'object_under_construction_record', 'params', 'type', 'value'],
+            ['extract_base_params_under_construction', 'object_under_construction_record', 'cost', 'value'],
 
-            ['extract_base_params_car_parking_space', 'car_parking_space_record', 'params', 'special_type', 'value'],
-            ['extract_base_params_car_parking_space', 'status'],
-            ['extract_base_params_car_parking_space', 'car_parking_space_record', 'special_notes'],
+            ['extract_base_params_under_construction', 'object_under_construction_record', 'params', 'permitted_uses', 'permitted_use', 'value'],
+            ['extract_base_params_under_construction', 'object_under_construction_record', 'params', 'special_type', 'value'],
+            ['extract_base_params_under_construction', 'status'],
+            ['extract_base_params_under_construction', 'object_under_construction_record', 'special_notes'],
         ]
 
         for value_id, value in enumerate(simple_xml_values):
             self.xml_value_table.append(tm._try_get(self.xml_nested_dict, value))
+
+        # --- 4 == 6
+        anchor1 = len(self.xml_value_table)
+        self.xml_value_table.append(tm._try_get(self.xml_nested_dict, ['extract_base_params_under_construction', 'object_under_construction_record',
+                                                                       'object', 'common_data', 'type', 'value']))
+
+        # --- 5 == 7
+        anchor2 = len(self.xml_value_table)
+        dt = tm._try_get(self.xml_nested_dict, ['extract_base_params_under_construction',
+                                                'object_under_construction_record', 'record_info', 'registration_date'])
+        if dt:
+            dt = datetime.datetime.strptime(dt, "%Y-%m-%dT%H:%M:%S%z").date()
+        self.xml_value_table.append(dt)
+
+        # --- 8 +
+        anchor3 = len(self.xml_value_table)
+        old_numbers = "; \n\n".join([", ".join([str(i).strip() for i in j.itertext() if str(i).strip()]) for j in
+                                     root.findall('cad_links/old_numbers')])
+        if old_numbers:
+            self.xml_value_table.append(old_numbers)
+        else:
+            self.xml_value_table.append("-")
+
+        # --- 16
+        anchor4 = len(self.xml_value_table)
+        land_cad_numbers = tm._try_get(self.xml_nested_dict,
+                                       ['extract_base_params_under_construction', 'object_under_construction_record', 'cad_links', 'included_objects',
+                                        'included_object']
+                                       )
+        s12 = lambda s: "".join([str(tm._try_get(s, ["cad_number"])), " ; "])
+        self.xml_value_table.append("".join([str(i) for i in tm.iflist(land_cad_numbers, s12)]))
+
+        # --- 21
+        anchor5 = len(self.xml_value_table)
+        right_holders_name = [[i for i in j.itertext()][0] for j in
+                              root.findall('right_records/right_record/right_holders//value')]
+        self.xml_value_table.append("; \n".join(right_holders_name))
+
+        # --- 22
+        _type = [[i for i in j.itertext()][0] for j in
+                 root.findall('right_records/right_record/right_data/right_type/value')]
+        right_number = [[i for i in j.itertext()][0] for j in
+                        root.findall('right_records/right_record/right_data/right_number')]
+        date = [str(datetime.datetime.strptime([i for i in j.itertext()][0], "%Y-%m-%dT%H:%M:%S%z").date()) for j in
+                root.findall('right_records/right_record/record_info/registration_date')]
+        self.xml_value_table.append("; \n".join([", ".join(el) for i, el in enumerate(zip(_type, right_number, date))]))
+
+        # --- 23
+        ud = "; \n".join([", ".join([i for i in j.itertext()]) for j in
+                          root.findall('right_records/right_record/underlying_documents/underlying_document')])
+        if ud:
+            self.xml_value_table.append(ud)
+        else:
+            self.xml_value_table.append("-")
+
+        # --- 24
+        rr = "; \n\n".join([", ".join([str(i).strip() for i in j.itertext() if str(i).strip()]) for j in
+                            root.findall('restrict_records/restrict_record')])
+        # rights = tm._try_get(self.xml_nested_dict, ['extract_base_params_under_construction', 'restrict_records'])
+        if rr!="":
+            self.xml_value_table.append(rr)
+        else:
+            self.xml_value_table.append("-")
+
+        # --- 25
+        _expropriation_info_type = [[i for i in j.itertext()][0] for j in
+                 root.findall('expropriation_info/expropriation_info_type')]
+        _origin_content = [[i for i in j.itertext()][0] for j in
+                        root.findall('expropriation_info/origin_content')]
+
+        self.xml_value_table.append("; \n".join([", ".join(el) for i, el in enumerate(zip(_expropriation_info_type,
+                                                                                          _origin_content))]))
+
+        # --- 26
+        rr = "; \n\n".join([", ".join([str(i).strip() for i in j.itertext() if str(i).strip()]) for j in
+                            root.findall('extract_base_params_under_construction/deal_records/deal_record')])
+        # rights = tm._try_get(self.xml_nested_dict, ['extract_base_params_under_construction', 'restrict_records'])
+        if rr != "":
+            self.xml_value_table.append(rr)
+        else:
+            self.xml_value_table.append("-")
 
         # PHASE 2 - now, we have all The Data we need! Now it's time to find our data in Xml_table and push it
         # to Excel_table.
@@ -69,9 +158,42 @@ class PomeshhenijaRow:
         self.excel_table[0] = os.path.split(self.filename)[-1]
 
         # simple excel fields
-        simple_excel__column_destination = [2, 3,   5, 6, 7,   9, 10, 11, 12, 13, 14, 15,   18, 19, 20]
+        simple_excel__column_destination = [2, 3,   5, 6, 7,   9, 10, 11, 12, 13, 14, 15,   17, 18, 19, 20]
         for i, excel_id in enumerate(simple_excel__column_destination):
             self.excel_table[excel_id - 1] = self.xml_value_table[i + ANCHOR0]
+
+        # anchor1 - field #4
+        if self.xml_value_table[anchor1] == "object_under_construction_record":
+            self.excel_table[4 - 1] = "Помещение"
+        else:
+            self.excel_table[4 - 1] = self.xml_value_table[anchor1]
+
+        # anchor2 - field #5
+        self.excel_table[5 - 1] = self.xml_value_table[anchor2]
+
+        # anchor3 - field #8
+        self.excel_table[8 - 1] = self.xml_value_table[anchor3]
+
+        # anchor4 - field #16
+        self.excel_table[16 - 1] = self.xml_value_table[anchor4]
+
+        # anchor5 - field #21
+        self.excel_table[21 - 1] = self.xml_value_table[anchor5]
+
+        # anchor5 - field #22
+        self.excel_table[22 - 1] = self.xml_value_table[anchor5 + 1]
+
+        # anchor5 - field #23
+        self.excel_table[23 - 1] = self.xml_value_table[anchor5 + 2]
+
+        # anchor5 - field #24
+        self.excel_table[24 - 1] = self.xml_value_table[anchor5 + 3]
+
+        # anchor5 - field #25
+        self.excel_table[25 - 1] = self.xml_value_table[anchor5 + 4]
+
+        # anchor5 - field #25
+        self.excel_table[26 - 1] = self.xml_value_table[anchor5 + 5]
 
         return self.excel_table
 
