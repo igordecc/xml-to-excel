@@ -91,7 +91,6 @@ class PomeshhenijaRow:
         s12 = lambda s: "".join([str(tm._try_get(s, ["cad_number"])), " ; "])
         self.xml_value_table.append("".join([str(i) for i in tm.iflist(land_cad_numbers, s12)]))
 
-        # TODO remake into more objects
         # --- 17 == 28 soor
         anchor5 = len(self.xml_value_table)
         right_holders_name = [[i for i in j.itertext()][0] for j in root.findall('right_records/right_record/right_holders//value')]

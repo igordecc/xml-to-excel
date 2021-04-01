@@ -83,7 +83,10 @@ class ONSRow:
         # 8
         old_numbers = " , ".join([" ".join(([i for i in j.itertext()])) for j in
                    root.findall("cad_links/old_numbers/old_number")])
-        self.xml_value_table.append(old_numbers)
+        if old_numbers != "":
+            self.xml_value_table.append(old_numbers)
+        else:
+            self.xml_value_table.append("-")
 
         # 10=12
         anchor2 = len(self.xml_value_table)
@@ -105,7 +108,11 @@ class ONSRow:
         volume = "Объем в кубических метрах с округлением до 1 кубического метра " + get_param("volume") + " ; \n"
         height = "Высота в метрах с округлением до 0,1 метра " + get_param("height") + " ; \n"
 
-        self.xml_value_table.append("".join([area, built_up_area, extension, depth, occurence_depth, volume, height]))
+        _final = "".join([area, built_up_area, extension, depth, occurence_depth, volume, height])
+        if _final != "":
+            self.xml_value_table.append(_final)
+        else:
+            self.xml_value_table.append("-")
 
         # 11
         degree_readiness = [[i for i in j.itertext()][0] for j in root.findall("params/degree_readiness")]
@@ -117,7 +124,11 @@ class ONSRow:
         anchor3 = len(self.xml_value_table)
         land_cad_numbers = " , ".join([" ".join([i for i in j.itertext()]) for j in
                                        root.findall("cad_links/land_cad_numbers/land_cad_number/cad_number")])
-        self.xml_value_table.append(land_cad_numbers)
+        if land_cad_numbers != "":
+            self.xml_value_table.append(land_cad_numbers)
+        else:
+            self.xml_value_table.append("-")
+
 
         # 17
         anchor4 = len(self.xml_value_table)
@@ -126,7 +137,7 @@ class ONSRow:
         if p:
             p = p[0]
         else:
-            p = ""
+            p = "-"
         self.xml_value_table.append(p)
 
         # 18
@@ -158,6 +169,38 @@ class ONSRow:
                 root.findall('right_records/right_record/record_info/registration_date')]
         self.xml_value_table.append("; \n".join([", ".join(el) for i, el in enumerate(zip(_type, right_number, date))]))
 
+        # --- 20
+        ud = "; \n".join([", ".join([i for i in j.itertext()]) for j in
+                          root.findall('right_records/right_record/underlying_documents/underlying_document')])
+        if ud:
+            self.xml_value_table.append(ud)
+        else:
+            self.xml_value_table.append("-")
+
+        # --- 21
+        rr = "; \n\n".join([", ".join([str(i).strip() for i in j.itertext() if str(i).strip()]) for j in
+                            root.findall('restrict_records/restrict_record')])
+        # rights = tm._try_get(self.xml_nested_dict, ['extract_base_params_under_construction', 'restrict_records'])
+        self.xml_value_table.append(rr)
+
+        # --- 22
+        _expropriation_info_type = [[i for i in j.itertext()][0] for j in
+                                    root.findall('expropriation_info/expropriation_info_type')]
+        _origin_content = [[i for i in j.itertext()][0] for j in
+                           root.findall('expropriation_info/origin_content')]
+
+        self.xml_value_table.append("; \n".join([", ".join(el) for i, el in enumerate(zip(_expropriation_info_type,
+                                                                                          _origin_content))]))
+
+        # --- 23
+        rr = "; \n\n".join([", ".join([str(i).strip() for i in j.itertext() if str(i).strip()]) for j in
+                            root.findall('extract_base_params_under_construction/deal_records/deal_record')])
+        # rights = tm._try_get(self.xml_nested_dict, ['extract_base_params_room', 'restrict_records'])
+        if rr != "":
+            self.xml_value_table.append(rr)
+        else:
+            self.xml_value_table.append("-")
+
         # PHASE 2 - now, we have all The Data we need! Now it's time to find our data in Xml_table and push it
         # to Excel_table.
         # Simple case:  we pushing one xml_value to one excel_column
@@ -185,6 +228,11 @@ class ONSRow:
         self.excel_table[17 - 1] = self.xml_value_table[anchor4]
         self.excel_table[18 - 1] = self.xml_value_table[anchor4+1]
         self.excel_table[19 - 1] = self.xml_value_table[anchor4+2]
+        self.excel_table[20 - 1] = self.xml_value_table[anchor4 + 3]
+        self.excel_table[21 - 1] = self.xml_value_table[anchor4 + 4]
+        self.excel_table[22 - 1] = self.xml_value_table[anchor4 + 5]
+        self.excel_table[23 - 1] = self.xml_value_table[anchor4 + 6]
+
         # self.excel_table[4 - 1] = self.xml_value_table[i + anchor1]
 
 
