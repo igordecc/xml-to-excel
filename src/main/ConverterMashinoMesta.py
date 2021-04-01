@@ -3,7 +3,6 @@ import try_modules as tm
 
 import os, sys
 import xmltodict
-import pandas
 import traceback
 import datetime
 import xml.etree.ElementTree as et
@@ -65,7 +64,8 @@ class PomeshhenijaRow:
 
         # --- 4 == 6
         anchor1 = len(self.xml_value_table)
-        self.xml_value_table.append(tm._try_get(self.xml_nested_dict, ['extract_base_params_under_construction', 'object_under_construction_record',
+        self.xml_value_table.append(tm._try_get(self.xml_nested_dict, ['extract_base_params_under_construction',
+                                                                       'object_under_construction_record',
                                                                        'object', 'common_data', 'type', 'value']))
 
         # --- 5 == 7
@@ -88,9 +88,9 @@ class PomeshhenijaRow:
         # --- 16
         anchor4 = len(self.xml_value_table)
         land_cad_numbers = tm._try_get(self.xml_nested_dict,
-                                       ['extract_base_params_under_construction', 'object_under_construction_record', 'cad_links', 'included_objects',
-                                        'included_object']
-                                       )
+                                       ['extract_base_params_under_construction', 'object_under_construction_record',
+                                        'cad_links', 'included_objects',
+                                        'included_object'])
         s12 = lambda s: "".join([str(tm._try_get(s, ["cad_number"])), " ; "])
         self.xml_value_table.append("".join([str(i) for i in tm.iflist(land_cad_numbers, s12)]))
 
@@ -131,14 +131,12 @@ class PomeshhenijaRow:
                  root.findall('expropriation_info/expropriation_info_type')]
         _origin_content = [[i for i in j.itertext()][0] for j in
                         root.findall('expropriation_info/origin_content')]
-
         self.xml_value_table.append("; \n".join([", ".join(el) for i, el in enumerate(zip(_expropriation_info_type,
                                                                                           _origin_content))]))
 
         # --- 26
         rr = "; \n\n".join([", ".join([str(i).strip() for i in j.itertext() if str(i).strip()]) for j in
                             root.findall('extract_base_params_under_construction/deal_records/deal_record')])
-        # rights = tm._try_get(self.xml_nested_dict, ['extract_base_params_under_construction', 'restrict_records'])
         if rr != "":
             self.xml_value_table.append(rr)
         else:
@@ -168,31 +166,15 @@ class PomeshhenijaRow:
         else:
             self.excel_table[4 - 1] = self.xml_value_table[anchor1]
 
-        # anchor2 - field #5
+        # anchor n - field m #
         self.excel_table[5 - 1] = self.xml_value_table[anchor2]
-
-        # anchor3 - field #8
         self.excel_table[8 - 1] = self.xml_value_table[anchor3]
-
-        # anchor4 - field #16
         self.excel_table[16 - 1] = self.xml_value_table[anchor4]
-
-        # anchor5 - field #21
         self.excel_table[21 - 1] = self.xml_value_table[anchor5]
-
-        # anchor5 - field #22
         self.excel_table[22 - 1] = self.xml_value_table[anchor5 + 1]
-
-        # anchor5 - field #23
         self.excel_table[23 - 1] = self.xml_value_table[anchor5 + 2]
-
-        # anchor5 - field #24
         self.excel_table[24 - 1] = self.xml_value_table[anchor5 + 3]
-
-        # anchor5 - field #25
         self.excel_table[25 - 1] = self.xml_value_table[anchor5 + 4]
-
-        # anchor5 - field #25
         self.excel_table[26 - 1] = self.xml_value_table[anchor5 + 5]
 
         return self.excel_table

@@ -153,25 +153,12 @@ class PomeshhenijaRow:
         else:
             self.excel_table[6 - 1] = self.xml_value_table[anchor1]
 
-        # anchor2 - field #7
         self.excel_table[7 - 1] = self.xml_value_table[anchor2]
-
-        # anchor3 - field #8
         self.excel_table[8 - 1] = self.xml_value_table[anchor3]
-
-        # anchor4 - field #23
         self.excel_table[23 - 1] = self.xml_value_table[anchor4]
-
-        # anchor4 - field #24
         self.excel_table[24 - 1] = self.xml_value_table[anchor4+1] + self.xml_value_table[anchor4+2]
-
-        # anchor5 - field #25
         self.excel_table[25 - 1] = "".join(self.xml_value_table[anchor5])
-
-        # anchor6 - field #28
         self.excel_table[28 - 1] = self.xml_value_table[anchor6]
-
-        # anchor7 - field #29
         self.excel_table[29 - 1] = self.xml_value_table[anchor7]
 
         return self.excel_table

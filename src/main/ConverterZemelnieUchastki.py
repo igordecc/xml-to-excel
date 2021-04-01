@@ -3,7 +3,6 @@ import try_modules as tm
 
 import os, sys
 import xmltodict
-import pandas
 import traceback
 import datetime
 import xml.etree.ElementTree as et
@@ -144,25 +143,12 @@ class PomeshhenijaRow:
         else:
             self.excel_table[4 - 1] = self.xml_value_table[anchor1]
 
-        # anchor2 - field #5
         self.excel_table[5 - 1] = self.xml_value_table[anchor2]
-
-        # anchor3 - field #8
         self.excel_table[8 - 1] = self.xml_value_table[anchor3]
-
-        # anchor4 - field #12
         self.excel_table[12 - 1] = self.xml_value_table[anchor4]
-
-        # anchor5 - field #17
         self.excel_table[17 - 1] = self.xml_value_table[anchor5]
-
-        # ancho6 - field 18
         self.excel_table[18 - 1] = self.xml_value_table[anchor5+1]
-
-        # anchor9 - field #19
         self.excel_table[19 - 1] = self.xml_value_table[anchor5+2]
-
-        # anchor9 - field #20
         self.excel_table[20 - 1] = self.xml_value_table[anchor5+3]
 
         return self.excel_table

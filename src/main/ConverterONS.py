@@ -3,7 +3,6 @@ import try_modules as tm
 
 import os, sys
 import xmltodict
-import pandas
 import traceback
 import xml.etree.ElementTree as et
 import datetime
@@ -232,9 +231,6 @@ class ONSRow:
         self.excel_table[21 - 1] = self.xml_value_table[anchor4 + 4]
         self.excel_table[22 - 1] = self.xml_value_table[anchor4 + 5]
         self.excel_table[23 - 1] = self.xml_value_table[anchor4 + 6]
-
-        # self.excel_table[4 - 1] = self.xml_value_table[i + anchor1]
-
 
         return self.excel_table
 
