@@ -18,7 +18,7 @@ This project transforms and visualise global air traffic data for both historica
  - Depicting different metrics of how COVID-19 pandemic affected air traffic in the last year
 
 ## Project diagram
-![Project diagram image](https://github.com/igordecc/xml-to-excel/blob/master/Project_diagram.jpg?raw=true)
+![Project diagram image](https://github.com/igordecc/xml-to-excel/blob/feature/Project_diagram.jpg?raw=true)
 
 ## Project roadmap
-![Project roadmap image](https://github.com/igordecc/xml-to-excel/blob/master/Project_roadmap.jpg?raw=true)
+![Project roadmap image](https://github.com/igordecc/xml-to-excel/blob/feature/Project_roadmap.jpg?raw=true)
